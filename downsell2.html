@@ -389,14 +389,24 @@
             </div>
 
             <div class="btn-group">
-                <a class="btn-primary" href="#">QUERO DURAR MAIS NA CAMA</a>
-                <a class="btn-secondary" href="#">Não, obrigado</a>
-            </div>
+            <!-- Botão de Compra em 1 Clique (SDK RatixPay) -->
+            <button data-ratixpay-action="buy" data-ratixpay-offer="434aceed-0830-4c79-a36d-8160459a66d1" class="btn-primary" style="border: none; cursor: pointer;">
+                QUERO DURAR MAIS NA CAMA
+            </button>
+        
+            <!-- Link de Recusa (SDK RatixPay) -->
+            <a href="javascript:void(0)" data-ratixpay-action="reject" class="btn-secondary">
+                Não, obrigado
+            </a>
+        </div>
         </div>
 
     </div>
 </div>
 
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <!-- SDK RatixPay Funnel -->
+<script src="https://ratixpay.co.mz/js/funnel-sdk.js?v=1.0.1" defer></script>
 </body>
 </html>
