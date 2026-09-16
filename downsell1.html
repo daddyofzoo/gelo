@@ -387,16 +387,25 @@
                 <span class="old">169 MZN</span>
                 <span class="new">87 MZN</span>
             </div>
-
-            <div class="btn-group">
-                <a class="btn-primary" href="#">QUERO TER RESULTADOS EM 3 DIAS</a>
-                <a class="btn-secondary" href="upsell2.html">Não, obrigado</a>
-            </div>
+    
+                <div class="btn-group">
+                    <!-- Botão de Compra em 1 Clique (SDK RatixPay) -->
+                    <button data-ratixpay-action="buy" data-ratixpay-offer="a2517b8d-161f-4c77-9ec3-948e85930872" class="btn-primary" style="border: none; cursor: pointer;">
+                        QUERO TER RESULTADOS EM 3 DIAS
+                    </button>
+                
+                    <!-- Link de Recusa (SDK RatixPay) -->
+                    <a href="javascript:void(0)" data-ratixpay-action="reject" class="btn-secondary">
+                        Não, obrigado
+                    </a>
+                </div>
         </div>
 
     </div>
 </div>
 
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <script src="https://ratixpay.co.mz/js/funnel-sdk.js?v=1.0.1" defer></script>
 </body>
 </html>
