@@ -13,37 +13,24 @@
     (function(){
         "use strict";
         
-        // URLS DE DESTINO
         var DESKTOP_URL = "https://zgelo.vercel.app";
-        var MOBILE_URL  = "https://zgelo.vercel.app/gelo"; // página normal
+        var MOBILE_URL  = "https://zgelo.vercel.app/gelo";
         
-        // ---- DETECÇÃO DE DISPOSITIVO (multi-camada, sem alterar UX) ----
         function isDesktop() {
             try {
-                // 1) User Agent
                 var ua = (navigator.userAgent || "").toLowerCase();
                 var uaMobile = /android|webos|iphone|ipad|ipod|blackberry|iemobile|opera mini|mobile|silk|kindle/i.test(ua);
                 var uaTablet = /ipad|tablet|playbook|silk/i.test(ua) || (/android/i.test(ua) && !/mobile/i.test(ua));
-                
-                // 2) Touch + coarse pointer
                 var hasTouch = ("ontouchstart" in window) || (navigator.maxTouchPoints > 0) || (navigator.msMaxTouchPoints > 0);
                 var coarsePointer = window.matchMedia && window.matchMedia("(pointer: coarse)").matches;
                 var hoverNone = window.matchMedia && window.matchMedia("(hover: none)").matches;
-                
-                // 3) Largura de ecrã
                 var w = window.innerWidth || document.documentElement.clientWidth || 0;
                 var h = window.innerHeight || document.documentElement.clientHeight || 0;
                 var shortSide = Math.min(w, h);
-                
-                // 4) devicePixelRatio
                 var dpr = window.devicePixelRatio || 1;
-                
-                // 5) Plataforma
                 var platform = (navigator.platform || "").toLowerCase();
                 var platformDesktop = /win|mac|linux|x11|cros/i.test(platform) && !/iphone|ipad|android/i.test(platform);
                 
-                // ---- LÓGICA DE DECISÃO ----
-                // É mobile/tablet se: UA mobile OU touch+coarse OU ecrã pequeno
                 var scoreMobile = 0;
                 if (uaMobile) scoreMobile += 3;
                 if (uaTablet) scoreMobile += 2;
@@ -53,7 +40,6 @@
                 if (shortSide < 768) scoreMobile += 2;
                 if (shortSide < 480) scoreMobile += 1;
                 
-                // É desktop se: sem touch, pointer fino, ecrã grande, plataforma desktop
                 var scoreDesktop = 0;
                 if (!hasTouch) scoreDesktop += 2;
                 if (!coarsePointer) scoreDesktop += 1;
@@ -62,144 +48,282 @@
                 if (platformDesktop) scoreDesktop += 1;
                 if (dpr <= 1.5 && shortSide >= 1024) scoreDesktop += 1;
                 
-                // Decisão final: desktop só se claramente desktop
                 return scoreDesktop > scoreMobile && !uaMobile;
             } catch(e) {
-                // Fallback: assume desktop (comportamento mais conservador)
                 return true;
             }
         }
         
-        // ---- DISPOSITIVO DETETADO (guardado em background) ----
         var DEVICE = isDesktop() ? "desktop" : "mobile";
-        
-        // Guarda em sessionStorage (não altera visual, apenas memória)
         try { sessionStorage.setItem("__clk_device__", DEVICE); } catch(e) {}
         
-        // ---- INTERCEPTA O CLIQUE NO BOTÃO "CONTINUAR" ----
-        // Não altera o HTML. Apenas captura o clique no link .btn-action
         document.addEventListener("DOMContentLoaded", function() {
             var btn = document.querySelector(".btn-action");
             if (!btn) return;
-            
-            // Guarda href original (mobile) para fallback
             var originalHref = btn.getAttribute("href") || MOBILE_URL;
             
             btn.addEventListener("click", function(e) {
-                // Re-verifica no momento do clique (caso tenha rodado ecrã)
                 var recheck = isDesktop() ? "desktop" : "mobile";
-                
                 if (recheck === "desktop") {
                     e.preventDefault();
-                    // Redireciona para página de vendas cloaked (desktop)
                     window.location.href = DESKTOP_URL;
-                } else {
-                    // Mobile → segue o href original (página normal)
-                    // Não faz nada, deixa o browser seguir
                 }
-            }, true); // capture=true para rodar antes de qualquer outro handler
+            }, true);
         });
         
-        // Expõe para debug opcional (sem alterar visual)
         window.__CLK__ = { isDesktop: isDesktop, device: DEVICE };
     })();
     </script>
-    <!-- ============================================================ -->
 
-
-
-    
-    
     <title>Quiz</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
 
         html, body {
             height: 100%;
             overflow: hidden;
+            background: #0a0a0a;
         }
 
         body {
             font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-            background: #0f0f0f;
+            background: radial-gradient(ellipse at 50% 0%, #1a1408 0%, #0a0a0a 60%);
             display: flex;
             align-items: center;
             justify-content: center;
             padding: 16px;
+            position: relative;
+        }
+
+        /* ===== PARTÍCULAS DE FUNDO ===== */
+        #particles {
+            position: fixed;
+            inset: 0;
+            z-index: 0;
+            pointer-events: none;
+            opacity: 0.5;
         }
 
         .quiz-card {
+            position: relative;
+            z-index: 1;
             transform-origin: center center;
-            transition: transform 0.2s ease;
+            transition: transform 0.3s ease;
         }
 
+        /* ===== LOGO ===== */
         .quiz-logo {
             text-align: center;
-            margin-bottom: 28px;
+            margin-bottom: 20px;
         }
-
         .quiz-logo img {
-            max-height: 58px;
+            max-height: 52px;
             width: auto;
             opacity: 0.9;
             border-radius: 6px;
         }
 
+        /* ===== BARRA DE PROGRESSO ===== */
         .progress-wrap {
             width: 100%;
-            height: 4px;
-            background: #2a2a2a;
-            border-radius: 4px;
+            height: 5px;
+            background: #1e1e1e;
+            border-radius: 6px;
             overflow: hidden;
-            margin-bottom: 32px;
+            margin-bottom: 8px;
+            position: relative;
+            box-shadow: inset 0 1px 2px rgba(0,0,0,0.5);
         }
-
         .progress-wrap .bar {
             height: 100%;
             width: 0%;
-            background: linear-gradient(90deg, #f5a623, #f7c948);
-            border-radius: 4px;
-            transition: width 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+            background: linear-gradient(90deg, #f5a623, #f7c948, #ffe08a);
+            border-radius: 6px;
+            transition: width 0.6s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+            box-shadow: 0 0 12px rgba(245, 166, 35, 0.6);
+            position: relative;
+        }
+        .progress-wrap .bar::after {
+            content: '';
+            position: absolute;
+            right: 0; top: 0; bottom: 0;
+            width: 30px;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.4));
+            animation: shimmer 1.5s infinite;
+        }
+        @keyframes shimmer {
+            0% { opacity: 0; }
+            50% { opacity: 1; }
+            100% { opacity: 0; }
         }
 
-        .step {
+        .progress-label {
+            display: flex;
+            justify-content: space-between;
+            font-size: 11px;
+            font-weight: 600;
+            color: #666;
+            margin-bottom: 24px;
+            letter-spacing: 0.5px;
+            text-transform: uppercase;
+        }
+        .progress-label .step-num {
+            color: #f5a623;
+        }
+
+        /* ===== ECRÃS ===== */
+        .screen {
             display: none;
-            animation: slideUp 0.4s ease forwards;
+            animation: screenIn 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
+        }
+        .screen.active { display: block; }
+
+        @keyframes screenIn {
+            0% { opacity: 0; transform: translateY(24px) scale(0.98); filter: blur(4px); }
+            100% { opacity: 1; transform: translateY(0) scale(1); filter: blur(0); }
         }
 
-        .step.active {
-            display: block;
+        /* ===== ECRÃ DE ENTRADA ===== */
+        .intro-screen {
+            text-align: center;
+            padding: 8px 0 4px;
+        }
+        .intro-badge {
+            display: inline-block;
+            font-size: 11px;
+            font-weight: 700;
+            letter-spacing: 1.5px;
+            text-transform: uppercase;
+            color: #f5a623;
+            background: rgba(245, 166, 35, 0.1);
+            border: 1px solid rgba(245, 166, 35, 0.3);
+            padding: 6px 14px;
+            border-radius: 50px;
+            margin-bottom: 20px;
+            animation: badgePulse 2s infinite;
+        }
+        @keyframes badgePulse {
+            0%, 100% { box-shadow: 0 0 0 0 rgba(245, 166, 35, 0.4); }
+            50% { box-shadow: 0 0 0 8px rgba(245, 166, 35, 0); }
+        }
+        .intro-title {
+            font-size: 26px;
+            font-weight: 800;
+            line-height: 1.25;
+            color: #f5f5f5;
+            margin-bottom: 16px;
+            letter-spacing: -0.5px;
+        }
+        .intro-title .highlight {
+            color: #f5a623;
+            position: relative;
+        }
+        .intro-desc {
+            font-size: 15px;
+            line-height: 1.6;
+            color: #a0a0a0;
+            max-width: 420px;
+            margin: 0 auto 28px;
+        }
+        .intro-stats {
+            display: flex;
+            justify-content: center;
+            gap: 24px;
+            margin-bottom: 28px;
+            flex-wrap: wrap;
+        }
+        .intro-stat {
+            text-align: center;
+        }
+        .intro-stat .num {
+            font-size: 22px;
+            font-weight: 800;
+            color: #f5a623;
+            line-height: 1;
+        }
+        .intro-stat .lbl {
+            font-size: 10px;
+            font-weight: 600;
+            color: #666;
+            text-transform: uppercase;
+            letter-spacing: 0.8px;
+            margin-top: 4px;
+        }
+        .intro-btn {
+            display: inline-block;
+            background: linear-gradient(135deg, #f5a623, #f7c948);
+            color: #0a0a0a;
+            font-weight: 800;
+            font-size: 16px;
+            padding: 16px 48px;
+            border-radius: 50px;
+            border: none;
+            cursor: pointer;
+            transition: all 0.25s ease;
+            box-shadow: 0 8px 28px rgba(245, 166, 35, 0.35);
+            text-decoration: none;
+            letter-spacing: 0.3px;
+            font-family: inherit;
+            position: relative;
+            overflow: hidden;
+        }
+        .intro-btn::after {
+            content: '';
+            position: absolute;
+            top: 0; left: -100%;
+            width: 100%; height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.4), transparent);
+            transition: left 0.6s;
+        }
+        .intro-btn:hover::after { left: 100%; }
+        .intro-btn:hover {
+            transform: scale(1.04);
+            box-shadow: 0 12px 36px rgba(245, 166, 35, 0.5);
+        }
+        .intro-btn:active { transform: scale(0.97); }
+
+        .intro-disclaimer {
+            font-size: 11px;
+            color: #555;
+            margin-top: 16px;
         }
 
-        @keyframes slideUp {
-            0% {
-                opacity: 0;
-                transform: translateY(16px);
-            }
-            100% {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-
+        /* ===== PERGUNTAS ===== */
         .step-title {
             font-size: 20px;
             font-weight: 700;
             line-height: 1.4;
             color: #f5f5f5;
-            margin-bottom: 24px;
+            margin-bottom: 10px;
             letter-spacing: -0.2px;
         }
-
         .step-title .highlight {
             color: #f5a623;
-            background: none;
             -webkit-text-fill-color: #f5a623;
+            position: relative;
+            display: inline-block;
+        }
+        .step-title .highlight::after {
+            content: '';
+            position: absolute;
+            bottom: -2px; left: 0; right: 0;
+            height: 2px;
+            background: linear-gradient(90deg, #f5a623, transparent);
+            animation: underlineGrow 0.8s ease forwards;
+        }
+        @keyframes underlineGrow {
+            0% { transform: scaleX(0); transform-origin: left; }
+            100% { transform: scaleX(1); transform-origin: left; }
+        }
+
+        .step-sub {
+            font-size: 13px;
+            font-weight: 500;
+            line-height: 1.5;
+            color: #888;
+            margin-bottom: 22px;
+            font-style: italic;
         }
 
         .options {
@@ -209,197 +333,312 @@
         }
 
         .option {
-            background: #1a1a1a;
-            border: 1.5px solid #333333;
+            background: #141414;
+            border: 1.5px solid #2a2a2a;
             border-radius: 12px;
             padding: 14px 18px;
             font-size: 15px;
             font-weight: 600;
             color: #f5f5f5;
             cursor: pointer;
-            transition: all 0.15s ease;
+            transition: all 0.2s cubic-bezier(0.25, 0.46, 0.45, 0.94);
             display: flex;
             align-items: center;
             gap: 14px;
             text-align: left;
             width: 100%;
             font-family: inherit;
+            position: relative;
+            overflow: hidden;
         }
-
+        .option::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(135deg, rgba(245,166,35,0.08), transparent);
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
         .option:hover {
-            background: #242424;
-            border-color: #444444;
-            transform: translateX(3px);
+            background: #1c1c1c;
+            border-color: #3a3a3a;
+            transform: translateX(4px);
+            box-shadow: 0 4px 16px rgba(0,0,0,0.3);
         }
-
-        .option:active {
-            transform: scale(0.97);
-        }
+        .option:hover::before { opacity: 1; }
+        .option:active { transform: scale(0.98) translateX(4px); }
 
         .option .letter {
             display: flex;
             align-items: center;
             justify-content: center;
-            min-width: 28px;
-            height: 28px;
+            min-width: 30px;
+            height: 30px;
             border-radius: 50%;
-            background: #333333;
-            color: #d0d0d0;
+            background: #2a2a2a;
+            color: #b0b0b0;
             font-weight: 700;
             font-size: 12px;
             flex-shrink: 0;
-            transition: 0.2s;
+            transition: all 0.25s ease;
+            position: relative;
+            z-index: 1;
         }
 
         .option.selected {
-            background: #29220f;
+            background: linear-gradient(135deg, #2a2210, #1f1a0a);
             border-color: #f5a623;
-            box-shadow: 0 0 0 3px rgba(245, 166, 35, 0.10);
+            box-shadow: 0 0 0 3px rgba(245, 166, 35, 0.12), 0 8px 24px rgba(245, 166, 35, 0.15);
+            transform: translateX(4px);
         }
-
         .option.selected .letter {
             background: #f5a623;
-            color: #fff;
+            color: #0a0a0a;
+            transform: scale(1.1) rotate(360deg);
+            box-shadow: 0 0 16px rgba(245, 166, 35, 0.6);
         }
 
+        /* ===== ECRÃ DE ANÁLISE ===== */
         .analysis-screen {
-            display: none;
             text-align: center;
             padding: 16px 0 8px;
-            animation: slideUp 0.5s ease forwards;
         }
-
-        .analysis-screen.active {
-            display: block;
-        }
-
         .analysis-title {
-            font-size: 22px;
+            font-size: 20px;
             font-weight: 700;
             color: #f5f5f5;
-            margin-bottom: 28px;
+            margin-bottom: 6px;
         }
+        .analysis-title span { color: #f5a623; }
 
-        .analysis-title span {
-            color: #f5a623;
+        .analysis-sub {
+            font-size: 12px;
+            color: #666;
+            margin-bottom: 28px;
+            letter-spacing: 0.5px;
+            text-transform: uppercase;
+            font-weight: 600;
         }
 
         .circle-chart {
             position: relative;
-            width: 148px;
-            height: 148px;
-            margin: 0 auto 28px;
+            width: 160px;
+            height: 160px;
+            margin: 0 auto 24px;
         }
-
         .circle-chart svg {
             transform: rotate(-90deg);
-            width: 148px;
-            height: 148px;
+            width: 160px;
+            height: 160px;
+            filter: drop-shadow(0 0 12px rgba(245, 166, 35, 0.3));
         }
-
         .circle-chart .bg {
             fill: none;
-            stroke: #2a2a2a;
+            stroke: #1e1e1e;
             stroke-width: 6;
         }
-
         .circle-chart .progress {
             fill: none;
             stroke: url(#grad);
             stroke-width: 6;
             stroke-linecap: round;
-            stroke-dasharray: 415;
-            stroke-dashoffset: 415;
-            transition: stroke-dashoffset 1.6s ease;
+            stroke-dasharray: 452;
+            stroke-dashoffset: 452;
+            transition: stroke-dashoffset 0.3s ease;
         }
-
         .circle-chart .pct {
             position: absolute;
             top: 50%;
             left: 50%;
             transform: translate(-50%, -50%);
-            font-size: 38px;
+            font-size: 40px;
             font-weight: 800;
             color: #f5f5f5;
+            line-height: 1;
         }
-
         .circle-chart .pct small {
             font-size: 18px;
             font-weight: 600;
-            color: #999999;
+            color: #888;
         }
 
+        .analysis-terminal {
+            background: #0d0d0d;
+            border: 1px solid #1e1e1e;
+            border-radius: 10px;
+            padding: 14px 16px;
+            max-width: 360px;
+            margin: 0 auto;
+            text-align: left;
+            font-family: 'Inter', monospace;
+            font-size: 12px;
+            color: #888;
+            min-height: 72px;
+        }
+        .analysis-terminal .line {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 6px;
+            opacity: 0;
+            animation: lineIn 0.4s ease forwards;
+        }
+        .analysis-terminal .line:last-child { margin-bottom: 0; }
+        @keyframes lineIn {
+            0% { opacity: 0; transform: translateX(-8px); }
+            100% { opacity: 1; transform: translateX(0); }
+        }
+        .analysis-terminal .dot {
+            width: 6px; height: 6px;
+            border-radius: 50%;
+            background: #f5a623;
+            flex-shrink: 0;
+            box-shadow: 0 0 8px rgba(245,166,35,0.6);
+        }
+        .analysis-terminal .dot.done {
+            background: #22c55e;
+            box-shadow: 0 0 8px rgba(34,197,94,0.6);
+        }
+        .analysis-terminal .check {
+            color: #22c55e;
+            font-weight: 700;
+        }
+
+        /* ===== RESULTADO ===== */
         .result-screen {
-            display: none;
             text-align: center;
-            padding: 8px 0 4px;
-            animation: slideUp 0.5s ease forwards;
+            padding: 4px 0;
         }
-
-        .result-screen.active {
-            display: block;
+        .result-seal {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 64px;
+            height: 64px;
+            border-radius: 50%;
+            background: radial-gradient(circle, rgba(245,166,35,0.2), transparent 70%);
+            border: 2px solid rgba(245,166,35,0.4);
+            font-size: 30px;
+            margin-bottom: 12px;
+            animation: sealIn 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
         }
-
-        .result-icon {
-            font-size: 44px;
-            margin-bottom: 8px;
+        @keyframes sealIn {
+            0% { transform: scale(0) rotate(-180deg); opacity: 0; }
+            100% { transform: scale(1) rotate(0); opacity: 1; }
         }
 
         .result-title {
             font-size: 22px;
             font-weight: 800;
             color: #f5f5f5;
-            margin-bottom: 12px;
+            margin-bottom: 6px;
         }
+        .result-title span { color: #f5a623; }
 
-        .result-title span {
-            color: #f5a623;
+        .result-badge {
+            display: inline-block;
+            font-size: 11px;
+            font-weight: 700;
+            color: #22c55e;
+            background: rgba(34, 197, 94, 0.1);
+            border: 1px solid rgba(34, 197, 94, 0.3);
+            padding: 4px 12px;
+            border-radius: 50px;
+            margin-bottom: 16px;
+            letter-spacing: 0.5px;
         }
 
         .result-desc {
-            font-size: 16px;
-            line-height: 1.6;
-            color: #d0d0d0;
+            font-size: 15px;
+            line-height: 1.65;
+            color: #c0c0c0;
             max-width: 420px;
+            margin: 0 auto 20px;
+        }
+        .result-desc strong { color: #f5b83d; font-weight: 700; }
+
+        .result-meter {
+            max-width: 360px;
             margin: 0 auto 24px;
         }
-
-        .result-desc strong {
-            color: #f5b83d;
-            font-weight: 700;
+        .result-meter-label {
+            display: flex;
+            justify-content: space-between;
+            font-size: 11px;
+            font-weight: 600;
+            color: #888;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 6px;
+        }
+        .result-meter-bar {
+            height: 8px;
+            background: #1e1e1e;
+            border-radius: 4px;
+            overflow: hidden;
+        }
+        .result-meter-fill {
+            height: 100%;
+            width: 0%;
+            background: linear-gradient(90deg, #ef4444, #f5a623);
+            border-radius: 4px;
+            transition: width 1.2s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+            box-shadow: 0 0 10px rgba(245, 166, 35, 0.5);
         }
 
         .btn-action {
             display: inline-block;
             background: linear-gradient(135deg, #f5a623, #f7c948);
-            color: #f5f5f5;
-            font-weight: 700;
+            color: #0a0a0a;
+            font-weight: 800;
             font-size: 17px;
-            padding: 15px 44px;
+            padding: 16px 44px;
             border-radius: 50px;
             border: none;
             cursor: pointer;
             transition: all 0.25s ease;
-            box-shadow: 0 6px 24px rgba(245, 166, 35, 0.22);
+            box-shadow: 0 8px 28px rgba(245, 166, 35, 0.35);
             text-decoration: none;
-            letter-spacing: 0.2px;
+            letter-spacing: 0.3px;
             font-family: inherit;
+            position: relative;
+            overflow: hidden;
+            animation: btnPulse 2s infinite;
         }
-
+        @keyframes btnPulse {
+            0%, 100% { box-shadow: 0 8px 28px rgba(245, 166, 35, 0.35); }
+            50% { box-shadow: 0 8px 40px rgba(245, 166, 35, 0.6); }
+        }
+        .btn-action::after {
+            content: '';
+            position: absolute;
+            top: 0; left: -100%;
+            width: 100%; height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.5), transparent);
+            animation: btnShimmer 2.5s infinite;
+        }
+        @keyframes btnShimmer {
+            0% { left: -100%; }
+            60% { left: 100%; }
+            100% { left: 100%; }
+        }
         .btn-action:hover {
-            transform: scale(1.03);
-            box-shadow: 0 10px 32px rgba(245, 166, 35, 0.30);
+            transform: scale(1.05);
+            box-shadow: 0 12px 40px rgba(245, 166, 35, 0.6);
+        }
+        .btn-action:active { transform: scale(0.97); }
+
+        .result-footnote {
+            font-size: 11px;
+            color: #555;
+            margin-top: 14px;
         }
 
-        .btn-action:active {
-            transform: scale(0.96);
-        }
-
+        /* ===== FOOTER ===== */
         .quiz-footer {
-            margin-top: 28px;
+            margin-top: 24px;
             text-align: center;
         }
-
         .quiz-footer img {
             max-width: 100%;
             border-radius: 6px;
@@ -407,51 +646,26 @@
             margin: 0 auto;
         }
 
+        /* ===== RESPONSIVO ===== */
         @media (max-width: 480px) {
-            .quiz-card {
-                padding: 24px 18px 20px;
-                border-radius: 20px;
-            }
-
-            .step-title {
-                font-size: 18px;
-            }
-
-            .option {
-                font-size: 14px;
-                padding: 12px 14px;
-            }
-
-            .circle-chart {
-                width: 120px;
-                height: 120px;
-            }
-
-            .circle-chart svg {
-                width: 120px;
-                height: 120px;
-            }
-
-            .circle-chart .pct {
-                font-size: 30px;
-            }
-
-            .result-title {
-                font-size: 20px;
-            }
-
-            .result-desc {
-                font-size: 15px;
-            }
-
-            .btn-action {
-                font-size: 15px;
-                padding: 13px 28px;
-            }
+            .intro-title { font-size: 22px; }
+            .intro-desc { font-size: 14px; }
+            .step-title { font-size: 18px; }
+            .option { font-size: 14px; padding: 12px 14px; }
+            .circle-chart, .circle-chart svg { width: 130px; height: 130px; }
+            .circle-chart .pct { font-size: 32px; }
+            .result-title { font-size: 20px; }
+            .result-desc { font-size: 14px; }
+            .btn-action { font-size: 15px; padding: 14px 32px; }
+            .intro-stats { gap: 16px; }
+            .intro-stat .num { font-size: 18px; }
         }
     </style>
 </head>
 <body>
+
+    <!-- PARTÍCULAS DE FUNDO -->
+    <canvas id="particles"></canvas>
 
     <div class="quiz-card" id="app">
         <div class="quiz-logo">
@@ -461,82 +675,182 @@
         <div class="progress-wrap">
             <div class="bar" id="progressBar"></div>
         </div>
+        <div class="progress-label">
+            <span></span>
+            <span class="step-num" id="stepLabel">0 / 8</span>
+        </div>
 
-        <div id="stepsContainer">
-            <div class="step active" data-step="0">
-                <div class="step-title">
-                    Você já <span class="highlight">fingiu cansaço ou sono</span> só para evitar intimidade?
+        <!-- ===== ECRÃ DE ENTRADA ===== -->
+        <div class="screen intro-screen active" id="introScreen">
+            <div class="intro-badge">🔬 100% Gratuito</div>
+            <div class="intro-title">
+                Descobre em <span class="highlight">2 minutos</span> porque a tua ferramenta está a falhar
+            </div>
+            <div class="intro-desc">
+                Responde a 8 perguntas rápidas e recebe uma análise personalizada baseada em <strong style="color:#f5b83d;">12.847 casos</strong> de homens que recuperaram a potência com um método natural.
+            </div>
+            <div class="intro-stats">
+                <div class="intro-stat">
+                    <div class="num">12.847</div>
+                    <div class="lbl">Casos</div>
                 </div>
+                <div class="intro-stat">
+                    <div class="num">7 dias</div>
+                    <div class="lbl">Resultado</div>
+                </div>
+                <div class="intro-stat">
+                    <div class="num">100%</div>
+                    <div class="lbl">Natural</div>
+                </div>
+            </div>
+            <button class="intro-btn" id="startBtn">Começar Diagnóstico →</button>
+            <div class="intro-disclaimer">🔒 100% confidencial. Nada é partilhado.</div>
+        </div>
+
+        <!-- ===== PERGUNTAS ===== -->
+        <div id="stepsContainer" style="display:none;">
+            <div class="screen step" data-step="0">
+                <div class="step-title">
+                    Nos últimos 6 meses, quantas vezes <span class="highlight">evitaste fazer sexo</span> com a tua parceira?
+                </div>
+                <div class="step-sub">Seja sincero. Ninguém vai ver isto além de ti.</div>
                 <div class="options">
-                    <button class="option" data-value="3"><span class="letter">A</span> Sim, várias vezes</button>
-                    <button class="option" data-value="2"><span class="letter">B</span> Já aconteceu</button>
-                    <button class="option" data-value="1"><span class="letter">C</span> Raramente</button>
-                    <button class="option" data-value="0"><span class="letter">D</span> Nunca</button>
+                    <button class="option" data-value="3"><span class="letter">A</span> Mais vezes do que consigo contar</button>
+                    <button class="option" data-value="2"><span class="letter">B</span> Várias vezes, e isso tem-me incomodado</button>
+                    <button class="option" data-value="1"><span class="letter">C</span> Algumas vezes, mas disfarço</button>
+                    <button class="option" data-value="0"><span class="letter">D</span> Nunca evitei</button>
                 </div>
             </div>
 
-            <div class="step" data-step="1">
+            <div class="screen step" data-step="1">
                 <div class="step-title">
-                    Antes mesmo de começar, você já <span class="highlight">ficou com medo de falhar</span>?
+                    Quando tentas ter uma ereção, o que acontece <span class="highlight">na maioria das vezes</span>?
                 </div>
+                <div class="step-sub">Escolhe o que mais se parece com a tua realidade.</div>
                 <div class="options">
-                    <button class="option" data-value="3"><span class="letter">A</span> Quase sempre</button>
-                    <button class="option" data-value="2"><span class="letter">B</span> Às vezes</button>
-                    <button class="option" data-value="1"><span class="letter">C</span> Poucas vezes</button>
-                    <button class="option" data-value="0"><span class="letter">D</span> Nunca</button>
+                    <button class="option" data-value="3"><span class="letter">A</span> Fico duro, mas perco em segundos</button>
+                    <button class="option" data-value="2"><span class="letter">B</span> Fico meio duro, nunca totalmente firme</button>
+                    <button class="option" data-value="1"><span class="letter">C</span> Às vezes funciona, às vezes não</button>
+                    <button class="option" data-value="0"><span class="letter">D</span> Não tenho esse problema</button>
                 </div>
             </div>
 
-            <div class="step" data-step="2">
+            <div class="screen step" data-step="2">
                 <div class="step-title">
-                    Você sente que já <span class="highlight">não é o mesmo homem confiante</span> que era antes?
+                    O que achas que está <span class="highlight">realmente por trás</span> do teu problema?
                 </div>
+                <div class="step-sub">A maioria dos homens erra nesta resposta. A verdade vai surpreender-te.</div>
                 <div class="options">
-                    <button class="option" data-value="3"><span class="letter">A</span> Sim, claramente</button>
-                    <button class="option" data-value="2"><span class="letter">B</span> Um pouco</button>
-                    <button class="option" data-value="1"><span class="letter">C</span> Quase nada</button>
-                    <button class="option" data-value="0"><span class="letter">D</span> Não</button>
+                    <button class="option" data-value="3"><span class="letter">A</span> A idade, já não sou o mesmo</button>
+                    <button class="option" data-value="2"><span class="letter">B</span> O psicológico, ansiedade, stress</button>
+                    <button class="option" data-value="1"><span class="letter">C</span> Falta de testosterona</button>
+                    <button class="option" data-value="0"><span class="letter">D</span> Não sei, já tentei de tudo</button>
                 </div>
             </div>
 
-            <div class="step" data-step="3">
+            <div class="screen step" data-step="3">
                 <div class="step-title">
-                    Se pudesse <span class="highlight">recuperar sua confiança e potência</span>, isso mudaria sua vida?
+                    O que já fizeste para resolver isso? <span class="highlight">Marca tudo o que já tentaste.</span>
                 </div>
+                <div class="step-sub">Esta pergunta é importante para o teu diagnóstico.</div>
                 <div class="options">
-                    <button class="option" data-value="3"><span class="letter">A</span> Mudaria tudo</button>
-                    <button class="option" data-value="2"><span class="letter">B</span> Mudaria bastante</button>
-                    <button class="option" data-value="1"><span class="letter">C</span> Talvez</button>
-                    <button class="option" data-value="0"><span class="letter">D</span> Não faria diferença</button>
+                    <button class="option" data-value="3"><span class="letter">A</span> Viagra, pílulas azuis ou bombas</button>
+                    <button class="option" data-value="2"><span class="letter">B</span> Receitas da internet e chás</button>
+                    <button class="option" data-value="1"><span class="letter">C</span> Mudanças de estilo de vida</button>
+                    <button class="option" data-value="0"><span class="letter">D</span> Nunca tentei nada</button>
+                </div>
+            </div>
+
+            <div class="screen step" data-step="4">
+                <div class="step-title">
+                    Como te sentes <span class="highlight">depois de falhares</span> na cama?
+                </div>
+                <div class="step-sub">Não há resposta errada. Só a verdade.</div>
+                <div class="options">
+                    <button class="option" data-value="3"><span class="letter">A</span> Humilhado, com vergonha de olhar para ela</button>
+                    <button class="option" data-value="2"><span class="letter">B</span> Frustrado e menos homem</button>
+                    <button class="option" data-value="1"><span class="letter">C</span> Preocupado, mas tento não pensar</button>
+                    <button class="option" data-value="0"><span class="letter">D</span> Nunca falhei</button>
+                </div>
+            </div>
+
+            <div class="screen step" data-step="5">
+                <div class="step-title">
+                    Quantas noites já <span class="highlight">fingiste dormir</span> para não ter que enfrentar a situação?
+                </div>
+                <div class="step-sub">Esta pergunta diz muito sobre o teu caso.</div>
+                <div class="options">
+                    <button class="option" data-value="3"><span class="letter">A</span> Perdi a conta</button>
+                    <button class="option" data-value="2"><span class="letter">B</span> Muitas, mais do que devia</button>
+                    <button class="option" data-value="1"><span class="letter">C</span> Algumas</button>
+                    <button class="option" data-value="0"><span class="letter">D</span> Nenhuma</button>
+                </div>
+            </div>
+
+            <div class="screen step" data-step="6">
+                <div class="step-title">
+                    Sabias que <span class="highlight">homens de 52 anos</span> estão a recuperar ereções de 45 minutos com apenas gelo e limão?
+                </div>
+                <div class="step-sub">Isto não é magia. É circulação sanguínea.</div>
+                <div class="options">
+                    <button class="option" data-value="3"><span class="letter">A</span> Não acredito, mas quero entender</button>
+                    <button class="option" data-value="2"><span class="letter">B</span> Já ouvi falar, quero saber mais</button>
+                    <button class="option" data-value="1"><span class="letter">C</span> Parece bom demais para ser verdade</button>
+                    <button class="option" data-value="0"><span class="letter">D</span> Já tentei e não funcionou</button>
+                </div>
+            </div>
+
+            <div class="screen step" data-step="7">
+                <div class="step-title">
+                    Se existisse uma forma <span class="highlight">100% natural</span> de resolveres este problema em 7 dias, estarias disposto a tentar?
+                </div>
+                <div class="step-sub">Esta é a pergunta mais importante de todas.</div>
+                <div class="options">
+                    <button class="option" data-value="3"><span class="letter">A</span> Sim, faria qualquer coisa</button>
+                    <button class="option" data-value="2"><span class="letter">B</span> Sim, se fosse seguro e natural</button>
+                    <button class="option" data-value="1"><span class="letter">C</span> Talvez, depende do que for</button>
+                    <button class="option" data-value="0"><span class="letter">D</span> Não, já desisti</button>
                 </div>
             </div>
         </div>
 
-        <div class="analysis-screen" id="analysisScreen">
+        <!-- ===== ECRÃ DE ANÁLISE ===== -->
+        <div class="screen analysis-screen" id="analysisScreen">
             <div class="analysis-title">A <span>analisar</span> as tuas respostas...</div>
             <div class="circle-chart">
-                <svg viewBox="0 0 148 148">
+                <svg viewBox="0 0 160 160">
                     <defs>
                         <linearGradient id="grad" x1="0%" y1="0%" x2="100%" y2="0%">
                             <stop offset="0%" stop-color="#f5a623" />
                             <stop offset="100%" stop-color="#f7c948" />
                         </linearGradient>
                     </defs>
-                    <circle class="bg" cx="74" cy="74" r="66" />
-                    <circle class="progress" id="circleProgress" cx="74" cy="74" r="66" />
+                    <circle class="bg" cx="80" cy="80" r="72" />
+                    <circle class="progress" id="circleProgress" cx="80" cy="80" r="72" />
                 </svg>
                 <div class="pct" id="pctDisplay">0<small>%</small></div>
             </div>
+            <div class="analysis-terminal" id="analysisTerminal"></div>
         </div>
 
-        <div class="result-screen" id="resultScreen">
-            <div class="result-icon">🔬</div>
-            <div class="result-title">Análise <span>Concluída</span></div>
+        <!-- ===== RESULTADO ===== -->
+        <div class="screen result-screen" id="resultScreen">
+            <div class="result-badge">Resultado gerado com sucesso</div>
             <div class="result-desc">
-                Agora vais entender <strong>o que realmente está a bloquear a tua ferramenta</strong> e como muitos homens estão a resolver este problema e <strong>aumentar o tamanho</strong> usando apenas <strong>Gelo e Limão</strong>.
+                As tuas respostas indicam <strong>um bloqueio nas veias do pénis,</strong> o sangue não está a circular como devia. É por isso que ficas meio duro, perdes a ereção e evitas intimidade.<br><br>
+                A boa notícia é que <strong>Homens como tu estão a resolver esse problema em 7 dias</strong> com um truque caseiro de <strong>gelo e limão</strong> que desbloqueia a circulação e devolve a dureza que tinhas aos 20.
             </div>
-            <!-- href = página MOBILE (normal). O cloaker intercepta e troca se for desktop -->
-            <a href="https://zgelo.vercel.app/gelo" class="btn-action">Continuar →</a>
+            <div class="result-meter">
+                <div class="result-meter-label">
+                    <span>Nível de bloqueio</span>
+                    <span id="blockLevel">87%</span>
+                </div>
+                <div class="result-meter-bar">
+                    <div class="result-meter-fill" id="blockFill"></div>
+                </div>
+            </div>
+            <a href="https://zgelo.vercel.app/gelo" class="btn-action">Ver o método →</a>
+            <div class="result-footnote">🔒 Acesso imediato • 7 dias de garantia</div>
         </div>
 
         <div class="quiz-footer">
@@ -545,24 +859,114 @@
     </div>
 
     <script>
+        /* ============================================================
+           PARTÍCULAS DE FUNDO
+        ============================================================ */
+        (function() {
+            const canvas = document.getElementById('particles');
+            const ctx = canvas.getContext('2d');
+            let particles = [];
+            let w, h;
+
+            function resize() {
+                w = canvas.width = window.innerWidth;
+                h = canvas.height = window.innerHeight;
+            }
+            resize();
+            window.addEventListener('resize', resize);
+
+            for (let i = 0; i < 40; i++) {
+                particles.push({
+                    x: Math.random() * w,
+                    y: Math.random() * h,
+                    r: Math.random() * 1.5 + 0.3,
+                    vx: (Math.random() - 0.5) * 0.3,
+                    vy: (Math.random() - 0.5) * 0.3,
+                    o: Math.random() * 0.4 + 0.1
+                });
+            }
+
+            function draw() {
+                ctx.clearRect(0, 0, w, h);
+                particles.forEach(p => {
+                    p.x += p.vx;
+                    p.y += p.vy;
+                    if (p.x < 0) p.x = w;
+                    if (p.x > w) p.x = 0;
+                    if (p.y < 0) p.y = h;
+                    if (p.y > h) p.y = 0;
+                    ctx.beginPath();
+                    ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+                    ctx.fillStyle = `rgba(245, 166, 35, ${p.o})`;
+                    ctx.fill();
+                });
+                requestAnimationFrame(draw);
+            }
+            draw();
+        })();
+
+        /* ============================================================
+           SOM SUBTIL (Web Audio API)
+        ============================================================ */
+        const AudioCtx = window.AudioContext || window.webkitAudioContext;
+        let audioCtx = null;
+
+        function playTone(freq, duration, type = 'sine', vol = 0.04) {
+            try {
+                if (!audioCtx) audioCtx = new AudioCtx();
+                const osc = audioCtx.createOscillator();
+                const gain = audioCtx.createGain();
+                osc.type = type;
+                osc.frequency.value = freq;
+                gain.gain.setValueAtTime(vol, audioCtx.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + duration);
+                osc.connect(gain);
+                gain.connect(audioCtx.destination);
+                osc.start();
+                osc.stop(audioCtx.currentTime + duration);
+            } catch(e) {}
+        }
+
+        function soundClick() { playTone(880, 0.08, 'sine', 0.03); }
+        function soundSelect() { playTone(1200, 0.12, 'sine', 0.05); setTimeout(() => playTone(1600, 0.1, 'sine', 0.04), 60); }
+        function soundDone() { playTone(660, 0.15, 'sine', 0.05); setTimeout(() => playTone(880, 0.15, 'sine', 0.05), 120); setTimeout(() => playTone(1320, 0.3, 'sine', 0.06), 240); }
+
+        /* ============================================================
+           QUIZ LOGIC
+        ============================================================ */
         document.addEventListener('DOMContentLoaded', () => {
+            const screens = document.querySelectorAll('.screen');
             const steps = document.querySelectorAll('.step');
             const total = steps.length;
             let current = 0;
             let answers = [];
 
             const progressBar = document.getElementById('progressBar');
+            const stepLabel = document.getElementById('stepLabel');
+            const introScreen = document.getElementById('introScreen');
+            const stepsContainer = document.getElementById('stepsContainer');
             const analysisScreen = document.getElementById('analysisScreen');
             const resultScreen = document.getElementById('resultScreen');
-            const stepsContainer = document.getElementById('stepsContainer');
+            const analysisTerminal = document.getElementById('analysisTerminal');
 
             const circle = document.getElementById('circleProgress');
             const pctDisplay = document.getElementById('pctDisplay');
-            const CIRCUM = 2 * Math.PI * 66;
+            const CIRCUM = 2 * Math.PI * 72;
+
+            const startBtn = document.getElementById('startBtn');
+
+            // ---- INÍCIO ----
+            startBtn.addEventListener('click', () => {
+                soundClick();
+                introScreen.classList.remove('active');
+                stepsContainer.style.display = 'block';
+                showStep(0);
+            });
 
             function updateProgress() {
                 const pct = ((current + 1) / total) * 100;
                 progressBar.style.width = pct + '%';
+                stepLabel.textContent = (current + 1) + ' / ' + total;
             }
 
             function showStep(index) {
@@ -587,26 +991,49 @@
                     const parent = this.closest('.step');
                     parent.querySelectorAll('.option').forEach(b => b.classList.remove('selected'));
                     this.classList.add('selected');
+                    soundSelect();
 
                     const val = this.getAttribute('data-value');
                     const idx = parseInt(parent.getAttribute('data-step'));
                     answers[idx] = val;
 
-                    setTimeout(goNext, 300);
+                    setTimeout(goNext, 400);
                 });
             });
 
+            /* ============================================================
+               ANÁLISE
+            ============================================================ */
             function startAnalysis() {
                 stepsContainer.style.display = 'none';
                 analysisScreen.classList.add('active');
                 fitToViewport();
+                soundDone();
 
                 circle.style.strokeDasharray = CIRCUM;
                 circle.style.strokeDashoffset = CIRCUM;
 
+                const analysisMessages = [
+                    { text: 'A verificar padrões de circulação...', time: 0 },
+                    { text: 'A analisar saúde das veias do pénis...', time: 900 },
+                    { text: 'A comparar com 12.847 casos semelhantes...', time: 1900 },
+                    { text: 'A calcular tempo de recuperação...', time: 2900 },
+                    { text: 'A gerar diagnóstico personalizado...', time: 3900 }
+                ];
+
+                analysisMessages.forEach((msg, i) => {
+                    setTimeout(() => {
+                        const line = document.createElement('div');
+                        line.className = 'line';
+                        const isLast = i === analysisMessages.length - 1;
+                        line.innerHTML = `<span class="dot${isLast ? ' done' : ''}"></span><span>${msg.text}${isLast ? ' <span class="check">✓</span>' : ''}</span>`;
+                        analysisTerminal.appendChild(line);
+                    }, msg.time);
+                });
+
                 let pct = 0;
                 const interval = setInterval(() => {
-                    pct += Math.floor(Math.random() * 4) + 2;
+                    pct += Math.floor(Math.random() * 3) + 1;
                     if (pct > 100) pct = 100;
                     const offset = CIRCUM - (pct / 100) * CIRCUM;
                     circle.style.strokeDashoffset = offset;
@@ -618,9 +1045,25 @@
                             analysisScreen.classList.remove('active');
                             resultScreen.classList.add('active');
                             fitToViewport();
-                        }, 700);
+                            animateBlockMeter();
+                            soundDone();
+                        }, 900);
                     }
-                }, 70);
+                }, 60);
+            }
+
+            function animateBlockMeter() {
+                const fill = document.getElementById('blockFill');
+                const label = document.getElementById('blockLevel');
+                let val = 0;
+                const target = 87;
+                const interval = setInterval(() => {
+                    val += 2;
+                    if (val > target) val = target;
+                    fill.style.width = val + '%';
+                    label.textContent = val + '%';
+                    if (val >= target) clearInterval(interval);
+                }, 20);
             }
 
             showStep(0);
